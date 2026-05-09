@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return '<div class="d-flex gap-1 justify-content-center">'
             + '<button class="btn btn-sm btn-primary btn-edit" title="Edit"><i class="bi bi-pencil"></i></button>'
             + '<button class="btn btn-sm btn-warning btn-generate" title="Generate Docx"><i class="bi bi-file-word"></i></button>'
-            + '<button class="btn btn-sm btn-info btn-debug" title="Debug"><i class="bi bi-bug"></i></button>'
+            //+ '<button class="btn btn-sm btn-info btn-debug" title="Debug"><i class="bi bi-bug"></i></button>'
             + '<button class="btn btn-sm btn-danger btn-delete" title="Hapus"><i class="bi bi-trash"></i></button>'
             + '</div>';
     };
