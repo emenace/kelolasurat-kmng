@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const db = require('./database');
+const dbPegawai = require('./database_pegawai');
 
 const app = express();
 const port = 3000;
@@ -123,6 +124,22 @@ app.delete('/api/legalisir/:id', (req, res) => {
             return;
         }
         res.json({"message": "success"});
+    });
+});
+
+// --- API for Pegawai ---
+
+// Get all pegawai
+app.get('/api/pegawai', (req, res) => {
+    dbPegawai.all('SELECT "NO", "NAMA", "NIP BARU", "TMT KERJA", "Pangkat", "PANGKAT GOL/RUANG", "JABATAN", "TGL LAHIR", "TMT PENSIUN" FROM DataPegawai ORDER BY "NO" ASC', [], (err, rows) => {
+        if (err) {
+            res.status(400).json({"error": err.message});
+            return;
+        }
+        res.json({
+            "message": "success",
+            "data": rows
+        });
     });
 });
 
