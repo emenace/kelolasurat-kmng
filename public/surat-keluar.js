@@ -12,17 +12,23 @@ document.addEventListener('DOMContentLoaded', function() {
     var table = new Tabulator("#table-surat-keluar", {
         ajaxURL: "/api/surat-keluar", 
         ajaxResponse: function(url, params, response) {
+            let maxNo = 0;
+            if (response.data && response.data.length > 0) {
+                response.data.forEach(row => {
+                    let num = parseInt(row.nomor_urut);
+                    if (!isNaN(num) && num > maxNo) {
+                        maxNo = num;
+                    }
+                });
+            }
+            document.getElementById('nomor_urut').placeholder = maxNo + 1;
             return response.data; 
         },
-        layout: "fitColumns",      
-        responsiveLayout: "collapse",  
         pagination: "local",       
         paginationSize: 10,
         paginationSizeSelector: [10, 50, 100, true], // Add pagination size selector
         movableColumns: true,      
-        resizableColumnFit: true,  
         columns: [
-            {title: "No", field: "id", width: 70, hozAlign: "center", headerSort: false, formatter:"rownum"},
             {title: "Nomor Urut", field: "nomor_urut", headerFilter: "input", width: 120},
             {title: "Tanggal", field: "tanggal_surat", headerFilter: "input", width: 120},
             {title: "Nomor Surat", field: "nomor_surat", headerFilter: "input", width: 150},

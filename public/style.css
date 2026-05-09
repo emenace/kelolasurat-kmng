@@ -107,3 +107,39 @@ body {
     gap: 10px;
     margin-bottom: 10px;
 }
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .kemenag-header .navbar-brand {
+        font-size: 1rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .card-header .d-flex {
+        width: 100%;
+        margin-top: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .card-header .d-flex input#global-search {
+        width: 100% !important;
+        margin-bottom: 5px;
+    }
+
+    .card-header .d-flex button {
+        flex: 1;
+    }
+
+    .tabulator {
+        font-size: 14px;
+    }
+    
+    .card-body.p-0 {
+        overflow-x: auto;
+    }
+}
