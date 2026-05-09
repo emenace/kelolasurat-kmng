@@ -1,8 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
+const PizZip = require('pizzip');
+const Docxtemplater = require('docxtemplater');
+
 const db = require('./database');
 const dbPegawai = require('./database_pegawai');
+const dbSuratTugas = require('./database_surattugas');
 
 const app = express();
 const port = 3000;
@@ -139,6 +144,120 @@ app.get('/api/pegawai', (req, res) => {
         res.json({
             "message": "success",
             "data": rows
+        });
+    });
+});
+
+// --- API for Surat Tugas ---
+
+app.get('/api/surat-tugas/last-nomor', (req, res) => {
+    db.get('SELECT nomor_urut FROM surat_keluar ORDER BY CAST(nomor_urut AS INTEGER) DESC LIMIT 1', [], (err, row) => {
+        if (err) {
+            return res.status(400).json({"error": err.message});
+        }
+        let nextNumber = 1;
+        if (row && row.nomor_urut) {
+            nextNumber = parseInt(row.nomor_urut) + 1;
+            if (isNaN(nextNumber)) nextNumber = 1;
+        }
+        res.json({"message": "success", "data": { nextNumber }});
+    });
+});
+
+app.get('/api/surat-tugas', (req, res) => {
+    dbSuratTugas.all('SELECT * FROM surat_tugas ORDER BY id DESC', [], (err, rows) => {
+        if (err) return res.status(400).json({"error": err.message});
+        res.json({"message": "success", "data": rows});
+    });
+});
+
+app.get('/api/surat-tugas/:id', (req, res) => {
+    dbSuratTugas.get('SELECT * FROM surat_tugas WHERE id = ?', [req.params.id], (err, row) => {
+        if (err) return res.status(400).json({"error": err.message});
+        if (!row) return res.status(404).json({"error": "Not found"});
+        dbSuratTugas.all('SELECT * FROM surat_tugas_pegawai WHERE surat_tugas_id = ?', [req.params.id], (err, pegawaiRows) => {
+            if (err) return res.status(400).json({"error": err.message});
+            row.pegawai = pegawaiRows;
+            res.json({"message": "success", "data": row});
+        });
+    });
+});
+
+app.post('/api/surat-tugas', (req, res) => {
+    const data = req.body;
+    dbSuratTugas.run(
+        `INSERT INTO surat_tugas (surat_nomor, surat_tanggal, surat_bulan, surat_tahun, dasar_pengirim, dasar_nomor, dasar_tanggal, dasar_perihal, kegiatan_nama, kegiatan_haritanggal, kegiatan_waktu, pegawai_jumlah) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [data.surat_nomor, data.surat_tanggal, data.surat_bulan, data.surat_tahun, data.dasar_pengirim, data.dasar_nomor, data.dasar_tanggal, data.dasar_perihal, data.kegiatan_nama, data.kegiatan_haritanggal, data.kegiatan_waktu, data.pegawai_jumlah],
+        function(err) {
+            if (err) return res.status(400).json({"error": err.message});
+            const suratId = this.lastID;
+            if (data.pegawai && data.pegawai.length > 0) {
+                const stmt = dbSuratTugas.prepare(`INSERT INTO surat_tugas_pegawai (surat_tugas_id, nama, nip, pangkat, golongan, jabatan) VALUES (?,?,?,?,?,?)`);
+                data.pegawai.forEach(p => {
+                    stmt.run([suratId, p.nama, p.nip, p.pangkat, p.golongan, p.jabatan]);
+                });
+                stmt.finalize();
+            }
+            res.json({"message": "success", "data": { id: suratId }});
+        }
+    );
+});
+
+app.put('/api/surat-tugas/:id', (req, res) => {
+    const data = req.body;
+    const id = req.params.id;
+    dbSuratTugas.run(
+        `UPDATE surat_tugas SET surat_nomor=?, surat_tanggal=?, surat_bulan=?, surat_tahun=?, dasar_pengirim=?, dasar_nomor=?, dasar_tanggal=?, dasar_perihal=?, kegiatan_nama=?, kegiatan_haritanggal=?, kegiatan_waktu=?, pegawai_jumlah=? WHERE id=?`,
+        [data.surat_nomor, data.surat_tanggal, data.surat_bulan, data.surat_tahun, data.dasar_pengirim, data.dasar_nomor, data.dasar_tanggal, data.dasar_perihal, data.kegiatan_nama, data.kegiatan_haritanggal, data.kegiatan_waktu, data.pegawai_jumlah, id],
+        function(err) {
+            if (err) return res.status(400).json({"error": err.message});
+            dbSuratTugas.run('DELETE FROM surat_tugas_pegawai WHERE surat_tugas_id=?', [id], (err) => {
+                if (err) return res.status(400).json({"error": err.message});
+                if (data.pegawai && data.pegawai.length > 0) {
+                    const stmt = dbSuratTugas.prepare(`INSERT INTO surat_tugas_pegawai (surat_tugas_id, nama, nip, pangkat, golongan, jabatan) VALUES (?,?,?,?,?,?)`);
+                    data.pegawai.forEach(p => {
+                        stmt.run([id, p.nama, p.nip, p.pangkat, p.golongan, p.jabatan]);
+                    });
+                    stmt.finalize();
+                }
+                res.json({"message": "success"});
+            });
+        }
+    );
+});
+
+app.delete('/api/surat-tugas/:id', (req, res) => {
+    dbSuratTugas.run('DELETE FROM surat_tugas WHERE id=?', [req.params.id], function(err) {
+        if (err) return res.status(400).json({"error": err.message});
+        res.json({"message": "success"});
+    });
+});
+
+app.get('/api/surat-tugas/generate/:id', (req, res) => {
+    dbSuratTugas.get('SELECT * FROM surat_tugas WHERE id = ?', [req.params.id], (err, row) => {
+        if (err || !row) return res.status(400).json({"error": "Data not found"});
+        dbSuratTugas.all('SELECT * FROM surat_tugas_pegawai WHERE surat_tugas_id = ?', [req.params.id], (err, pegawaiRows) => {
+            if (err) return res.status(400).json({"error": err.message});
+            row.pegawai = pegawaiRows;
+
+            try {
+                // Read the dynamic template we generated
+                const content = fs.readFileSync(path.resolve(__dirname, 'template_dynamic.docx'), 'binary');
+                const zip = new PizZip(content);
+                const doc = new Docxtemplater(zip, {
+                    paragraphLoop: true,
+                    linebreaks: true,
+                });
+                doc.render(row);
+                const buf = doc.getZip().generate({ type: 'nodebuffer' });
+                
+                res.setHeader('Content-Disposition', `attachment; filename="Surat_Tugas_${row.surat_nomor || row.id}.docx"`);
+                res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                res.send(buf);
+            } catch (e) {
+                console.error(e);
+                res.status(500).json({"error": "Failed to generate document"});
+            }
         });
     });
 });
