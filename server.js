@@ -186,8 +186,8 @@ app.get('/api/surat-tugas/:id', (req, res) => {
 app.post('/api/surat-tugas', (req, res) => {
     const data = req.body;
     dbSuratTugas.run(
-        `INSERT INTO surat_tugas (surat_nomor, surat_tanggal, surat_bulan, surat_tahun, dasar_pengirim, dasar_nomor, dasar_tanggal, dasar_perihal, kegiatan_nama, kegiatan_haritanggal, kegiatan_waktu, pegawai_jumlah) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
-        [data.surat_nomor, data.surat_tanggal, data.surat_bulan, data.surat_tahun, data.dasar_pengirim, data.dasar_nomor, data.dasar_tanggal, data.dasar_perihal, data.kegiatan_nama, data.kegiatan_haritanggal, data.kegiatan_waktu, data.pegawai_jumlah],
+        `INSERT INTO surat_tugas (surat_nomor, surat_tanggal, surat_bulan, surat_tahun, dasar_pengirim, dasar_nomor, dasar_tanggal, dasar_perihal, kegiatan_nama, kegiatan_haritanggal, kegiatan_waktu, kegiatan_tempat, pegawai_jumlah) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [data.surat_nomor, data.surat_tanggal, data.surat_bulan, data.surat_tahun, data.dasar_pengirim, data.dasar_nomor, data.dasar_tanggal, data.dasar_perihal, data.kegiatan_nama, data.kegiatan_haritanggal, data.kegiatan_waktu, data.kegiatan_tempat, data.pegawai_jumlah],
         function(err) {
             if (err) return res.status(400).json({"error": err.message});
             const suratId = this.lastID;
@@ -207,8 +207,8 @@ app.put('/api/surat-tugas/:id', (req, res) => {
     const data = req.body;
     const id = req.params.id;
     dbSuratTugas.run(
-        `UPDATE surat_tugas SET surat_nomor=?, surat_tanggal=?, surat_bulan=?, surat_tahun=?, dasar_pengirim=?, dasar_nomor=?, dasar_tanggal=?, dasar_perihal=?, kegiatan_nama=?, kegiatan_haritanggal=?, kegiatan_waktu=?, pegawai_jumlah=? WHERE id=?`,
-        [data.surat_nomor, data.surat_tanggal, data.surat_bulan, data.surat_tahun, data.dasar_pengirim, data.dasar_nomor, data.dasar_tanggal, data.dasar_perihal, data.kegiatan_nama, data.kegiatan_haritanggal, data.kegiatan_waktu, data.pegawai_jumlah, id],
+        `UPDATE surat_tugas SET surat_nomor=?, surat_tanggal=?, surat_bulan=?, surat_tahun=?, dasar_pengirim=?, dasar_nomor=?, dasar_tanggal=?, dasar_perihal=?, kegiatan_nama=?, kegiatan_haritanggal=?, kegiatan_waktu=?, kegiatan_tempat=?, pegawai_jumlah=? WHERE id=?`,
+        [data.surat_nomor, data.surat_tanggal, data.surat_bulan, data.surat_tahun, data.dasar_pengirim, data.dasar_nomor, data.dasar_tanggal, data.dasar_perihal, data.kegiatan_nama, data.kegiatan_haritanggal, data.kegiatan_waktu, data.kegiatan_tempat, data.pegawai_jumlah, id],
         function(err) {
             if (err) return res.status(400).json({"error": err.message});
             dbSuratTugas.run('DELETE FROM surat_tugas_pegawai WHERE surat_tugas_id=?', [id], (err) => {
@@ -233,111 +233,247 @@ app.delete('/api/surat-tugas/:id', (req, res) => {
     });
 });
 
-// Helper: merge split text runs in Word XML so that template tags like
-// {pegawai.nama[1]} that Word splits across multiple <w:t> elements
-// become single continuous strings we can find-and-replace.
-function mergeDocxTextRuns(xml) {
-    // This regex finds sequences of </w:t></w:r><w:r ...><w:rPr>...</w:rPr><w:t ...>
-    // and merges them into a single text run, preserving only the first run's formatting.
-    // We do multiple passes to handle deeply split tags.
-    for (let i = 0; i < 10; i++) {
-        const before = xml;
-        xml = xml.replace(
-            /(<w:t[^>]*>)([^<]*)<\/w:t><\/w:r>(?:<w:proofErr[^\/]*\/>)*<w:r[^>]*><w:rPr>[^]*?<\/w:rPr><w:t[^>]*>([^<]*)/g,
-            '$1$2$3'
-        );
-        if (xml === before) break;
-    }
-    return xml;
-}
-
 app.get('/api/surat-tugas/generate/:id', (req, res) => {
     dbSuratTugas.get('SELECT * FROM surat_tugas WHERE id = ?', [req.params.id], (err, row) => {
         if (err || !row) return res.status(400).json({"error": "Data not found"});
         dbSuratTugas.all('SELECT * FROM surat_tugas_pegawai WHERE surat_tugas_id = ?', [req.params.id], (err, pegawaiRows) => {
             if (err) return res.status(400).json({"error": err.message});
 
-            try {
-                // Read ORIGINAL template
-                const content = fs.readFileSync(path.resolve(__dirname, 'template.docx'));
-                const zip = new PizZip(content);
-                let xml = zip.file('word/document.xml').asText();
-
-                // Step 1: Merge split text runs
-                xml = mergeDocxTextRuns(xml);
-
-                // Step 2: Find the table row (<w:tr>) containing {pegawai.nama[1]}
-                // and duplicate it for each employee
-                const rowRegex = /(<w:tr\b[^>]*>)([\s\S]*?{pegawai\.nama\[1\]}[\s\S]*?)(<\/w:tr>)/;
-                const rowMatch = xml.match(rowRegex);
-
-                if (rowMatch) {
-                    const templateRow = rowMatch[0]; // Full <w:tr>...</w:tr>
-
-                    // Also find and remove the [2] row if it exists
-                    const row2Regex = /<w:tr\b[^>]*>[\s\S]*?{pegawai\.nama\[2\]}[\s\S]*?<\/w:tr>/;
-                    xml = xml.replace(row2Regex, '');
-
-                    // Build replacement rows for each employee
-                    let allRows = '';
-                    for (let i = 0; i < pegawaiRows.length; i++) {
-                        let r = templateRow;
-                        const p = pegawaiRows[i];
-                        // Replace [1] tags with this employee's data
-                        r = r.replace(/\{pegawai\.nama\[1\]\}/g, p.nama || '');
-                        r = r.replace(/\{pegawai\.nip\[1\]\}/g, p.nip || '');
-                        r = r.replace(/\{pegawai\.pangkat\[1\]\}/g, p.pangkat || '');
-                        r = r.replace(/\{pegawai\.golongan\[1\]\}/g, p.golongan || '');
-                        r = r.replace(/\{pegawai\.jabatan\[1\]\}/g, p.jabatan || '');
-                        // Replace "1." numbering with actual number
-                        r = r.replace(/>1\.\s*</g, '>' + (i + 1) + '. <');
-                        allRows += r;
-                    }
-
-                    // Replace original [1] row with all generated rows
-                    xml = xml.replace(rowRegex, allRows);
-                } else {
-                    // Fallback: if no row pattern found, just do flat replacements
-                    for (let i = 0; i < pegawaiRows.length; i++) {
-                        const idx = i + 1;
-                        const p = pegawaiRows[i];
-                        xml = xml.replace(new RegExp('\\{pegawai\\.nama\\[' + idx + '\\]\\}', 'g'), p.nama || '');
-                        xml = xml.replace(new RegExp('\\{pegawai\\.nip\\[' + idx + '\\]\\}', 'g'), p.nip || '');
-                        xml = xml.replace(new RegExp('\\{pegawai\\.pangkat\\[' + idx + '\\]\\}', 'g'), p.pangkat || '');
-                        xml = xml.replace(new RegExp('\\{pegawai\\.golongan\\[' + idx + '\\]\\}', 'g'), p.golongan || '');
-                        xml = xml.replace(new RegExp('\\{pegawai\\.jabatan\\[' + idx + '\\]\\}', 'g'), p.jabatan || '');
-                    }
-                }
-
-                // Step 3: Replace other simple variables
-                xml = xml.replace(/\{surat_nomor\}/g, row.surat_nomor || '');
-                xml = xml.replace(/\{surat_tanggal\}/g, row.surat_tanggal || '');
-                xml = xml.replace(/\{surat_bulan\}/g, row.surat_bulan || '');
-                xml = xml.replace(/\{surat_tahun\}/g, row.surat_tahun || '');
-                xml = xml.replace(/\{dasar_pengirim\}/g, row.dasar_pengirim || '');
-                xml = xml.replace(/\{dasar_nomor\}/g, row.dasar_nomor || '');
-                xml = xml.replace(/\{dasar_tanggal\}/g, row.dasar_tanggal || '');
-                xml = xml.replace(/\{dasar_perihal\}/g, row.dasar_perihal || '');
-                xml = xml.replace(/\{kegiatan_nama\}/g, row.kegiatan_nama || '');
-                xml = xml.replace(/\{kegiatan_haritanggal\}/g, row.kegiatan_haritanggal || '');
-                xml = xml.replace(/\{kegiatan_waktu\}/g, row.kegiatan_waktu || '');
-                xml = xml.replace(/\{kegiatan_tempat\}/g, row.kegiatan_tempat || '');
-                xml = xml.replace(/\{pegawai_jumlah\}/g, String(row.pegawai_jumlah || pegawaiRows.length));
-
-                // Step 4: Clean up any remaining unfilled pegawai placeholders
-                xml = xml.replace(/\{pegawai\.\w+\[\d+\]\}/g, '');
-
-                // Step 5: Write back and send
-                zip.file('word/document.xml', xml);
-                const buf = zip.generate({ type: 'nodebuffer' });
-
-                res.setHeader('Content-Disposition', `attachment; filename="Surat_Tugas_${row.surat_nomor || row.id}.docx"`);
-                res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-                res.send(buf);
-            } catch (e) {
-                console.error('Generate error:', e);
-                res.status(500).json({"error": "Failed to generate document: " + e.message});
+            // Build pegawai table rows
+            let pegawaiTableRows = '';
+            for (let i = 0; i < pegawaiRows.length; i++) {
+                const p = pegawaiRows[i];
+                pegawaiTableRows += '<tr>'
+                    + '<td style="text-align:center;vertical-align:top;padding:6px 8px;border:1px solid #000;">' + (i + 1) + '</td>'
+                    + '<td style="vertical-align:top;padding:6px 8px;border:1px solid #000;">' + (p.nama || '') + '<br>' + (p.nip || '') + '</td>'
+                    + '<td style="vertical-align:top;padding:6px 8px;border:1px solid #000;">' + (p.pangkat || '') + '<br>(' + (p.golongan || '') + ')</td>'
+                    + '<td style="vertical-align:top;padding:6px 8px;border:1px solid #000;">' + (p.jabatan || '') + '</td>'
+                    + '</tr>';
             }
+
+            const html = `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surat Tugas - ${row.surat_nomor || ''}</title>
+<style>
+    @font-face {
+        font-family: 'Arial';
+        src: url('/Arial.ttf') format('truetype');
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #e0e0e0;
+        color: #000;
+    }
+    .page {
+        width: 210mm;
+        min-height: 330mm;
+        margin: 20px auto;
+        padding: 15mm 20mm 20mm 20mm;
+        background: #fff;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+        position: relative;
+    }
+    .no-print {
+        text-align: center;
+        padding: 16px;
+        background: #333;
+        color: #fff;
+    }
+    .no-print button {
+        padding: 10px 28px;
+        font-size: 15px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 0 6px;
+    }
+    .btn-print { background: #2196F3; color: #fff; }
+    .btn-back { background: #777; color: #fff; }
+
+    /* Header */
+    .kop-surat {
+        display: flex;
+        align-items: center;
+        border-bottom: 3px solid #000;
+        padding-bottom: 8px;
+        margin-bottom: 14px;
+    }
+    .kop-surat img { width: 70px; height: 70px; margin-right: 14px; }
+    .kop-surat .kop-text { text-align: center; flex: 1; }
+    .kop-surat .kop-text h2 { font-size: 14pt; margin-bottom: 1px; letter-spacing: 1px; }
+    .kop-surat .kop-text h3 { font-size: 12pt; margin-bottom: 2px; }
+    .kop-surat .kop-text p { font-size: 9pt; margin: 0; }
+
+    /* Title */
+    .title-section { text-align: center; margin: 18px 0 4px 0; }
+    .title-section h3 { font-size: 13pt; text-decoration: underline; letter-spacing: 2px; }
+    .title-section p { font-size: 11pt; margin-top: 2px; }
+
+    /* Content */
+    .content { font-size: 11pt; line-height: 1.7; margin-top: 16px; }
+    .content table.info-table td { vertical-align: top; padding: 2px 6px; }
+    .content table.info-table td:first-child { width: 90px; }
+    .content table.info-table td:nth-child(2) { width: 10px; text-align: center; }
+
+    /* Pegawai Table */
+    .memberi-tugas { text-align: center; font-weight: bold; font-size: 11pt; margin: 18px 0 6px 0; }
+    .kepada { font-size: 11pt; margin-bottom: 4px; }
+    table.pegawai-table { width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 14px; }
+    table.pegawai-table th { background: #f5f5f5; border: 1px solid #000; padding: 6px 8px; font-weight: bold; text-align: center; }
+
+    /* Detail kegiatan */
+    .detail-kegiatan { font-size: 11pt; line-height: 1.8; margin-bottom: 14px; }
+    .detail-kegiatan table td { padding: 1px 6px; vertical-align: top; }
+    .detail-kegiatan table td:first-child { width: 110px; }
+    .detail-kegiatan table td:nth-child(2) { width: 10px; }
+
+    /* Closing */
+    .closing { font-size: 11pt; line-height: 1.7; margin-bottom: 20px; }
+
+    /* Footer: QR + Signature */
+    .footer-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 20px;
+    }
+    .qr-code img {
+        width: 100px;
+        height: 100px;
+    }
+    .signature-right {
+        text-align: left;
+        font-size: 11pt;
+        line-height: 1.6;
+    }
+    .signature-right img {
+        width: 220px;
+        margin: -10px 0 -10px 0;
+        display: block;
+    }
+
+    /* Print */
+    @media print {
+        body { background: #fff; }
+        .no-print { display: none !important; }
+        .page {
+            width: 100%;
+            margin: 0;
+            padding: 15mm 20mm 20mm 20mm;
+            box-shadow: none;
+            min-height: auto;
+        }
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+    <button class="btn-back" onclick="history.back()">\u2190 Kembali</button>
+    <button class="btn-print" onclick="window.print()">\uD83D\uDDA8\uFE0F Cetak / Simpan PDF</button>
+</div>
+
+<div class="page">
+    <!-- KOP SURAT -->
+    <div class="kop-surat">
+        <img src="/Kementerian_Agama_new_logo.png" alt="Logo">
+        <div class="kop-text">
+            <h2>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h2>
+            <h3>KANTOR KEMENTERIAN AGAMA KOTA METRO</h3>
+            <p>Jl. Ki. Arsyad No. 6 Metro Pusat Kota Metro 34111</p>
+            <p>Telepon : (0725) 41828</p>
+            <p>Laman: kemenagkotametro.id / Posel: mailkemenag.kotametro@gmail.com</p>
+        </div>
+    </div>
+
+    <!-- JUDUL -->
+    <div class="title-section">
+        <h3>SURAT TUGAS</h3>
+        <p>NOMOR: B- ${row.surat_nomor || '...'}/Kk.08.10.1/ KP.07.1/${row.surat_bulan || '...'}/${row.surat_tahun || '...'}</p>
+    </div>
+
+    <!-- MENIMBANG & DASAR -->
+    <div class="content">
+        <table class="info-table">
+            <tr>
+                <td>Menimbang</td>
+                <td>:</td>
+                <td>
+                    a. bahwa dalam rangka ${row.kegiatan_nama || '...'}<br>
+                    b. bahwa yang namanya tercantum dalam Surat Tugas ini dipandang mampu untuk melaksanakan tugas;<br>
+                    c. bahwa berdasarkan pertimbangan sebagaimana dimaksud pada huruf a dan b, maka perlu dibuatkan Surat Tugas Kepala Kantor Kementerian Agama Kota Metro.
+                </td>
+            </tr>
+            <tr><td colspan="3" style="height:6px;"></td></tr>
+            <tr>
+                <td>Dasar</td>
+                <td>:</td>
+                <td>${row.dasar_pengirim || '...'} Nomor : ${row.dasar_nomor || '...'} tanggal ${row.dasar_tanggal || '...'} Perihal ${row.dasar_perihal || '...'}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- MEMBERI TUGAS -->
+    <p class="memberi-tugas">Memberi Tugas</p>
+    <p class="kepada">Kepada:</p>
+    <table class="pegawai-table">
+        <thead>
+            <tr>
+                <th style="width:40px;">No.</th>
+                <th>Nama / NIP</th>
+                <th>Pangkat / Golongan</th>
+                <th>Jabatan</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${pegawaiTableRows}
+        </tbody>
+    </table>
+
+    <!-- DETAIL KEGIATAN -->
+    <div class="detail-kegiatan">
+        <p>Untuk mengikuti ${row.kegiatan_nama || '...'}, pada ;</p>
+        <table>
+            <tr><td>Hari, Tanggal</td><td>:</td><td>${row.kegiatan_haritanggal || '...'}</td></tr>
+            <tr><td>Tempat</td><td>:</td><td>${row.kegiatan_tempat || '...'}</td></tr>
+            <tr><td>Waktu</td><td>:</td><td>${row.kegiatan_waktu || '...'}</td></tr>
+        </table>
+    </div>
+
+    <!-- PENUTUP -->
+    <div class="closing">
+        <p>Setelah selesai melaksanakan tugas agar melaporkan kepada Kepala Kantor Kementerian Agama Kota Metro.</p>
+        <br>
+        <p>Demikian surat tugas ini diberikan untuk dilaksanakan sebagaimana mestinya.</p>
+    </div>
+
+    <!-- QR + TANDA TANGAN -->
+    <div class="footer-section">
+        <div class="qr-code">
+            <img src="/qr_st.png" alt="QR Code">
+        </div>
+        <div class="signature-right">
+            <p>Metro, ${row.surat_tanggal || '...'}</p>
+            <p>Kepala</p>
+            <img src="/stamp.png" alt="Stempel dan Tanda Tangan">
+            <p>Abdul Haris</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>`;
+
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            res.send(html);
         });
     });
 });

@@ -23,8 +23,14 @@ const dbSuratTugas = new sqlite3.Database(dbPath, (err) => {
                 kegiatan_nama TEXT,
                 kegiatan_haritanggal TEXT,
                 kegiatan_waktu TEXT,
+                kegiatan_tempat TEXT,
                 pegawai_jumlah INTEGER
             )`);
+            
+            // Migration: add kegiatan_tempat if not exists (for existing databases)
+            dbSuratTugas.run(`ALTER TABLE surat_tugas ADD COLUMN kegiatan_tempat TEXT`, (err) => {
+                // Ignore error if column already exists
+            });
             
             dbSuratTugas.run(`CREATE TABLE IF NOT EXISTS surat_tugas_pegawai (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,

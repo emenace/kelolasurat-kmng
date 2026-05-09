@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var kegiatanNama = document.getElementById('kegiatan_nama');
     var kegiatanHariTanggal = document.getElementById('kegiatan_haritanggal');
     var kegiatanWaktu = document.getElementById('kegiatan_waktu');
+    var kegiatanTempat = document.getElementById('kegiatan_tempat');
 
     var pegawaiContainer = document.getElementById('pegawai-container');
     var btnTambahPegawai = document.getElementById('btn-tambah-pegawai');
@@ -139,14 +140,13 @@ document.addEventListener('DOMContentLoaded', function () {
         createPegawaiRow(null);
     });
 
-    // Format date string as Indonesian month
+    // Extract month as numeric (01-12) and year from date string
     function extractMonthYear(dateString) {
         if (!dateString) return { month: "", year: "" };
-        var d = new Date(dateString);
-        var months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        var parts = dateString.split('-'); // YYYY-MM-DD
         return {
-            month: months[d.getMonth()],
-            year: d.getFullYear().toString()
+            month: parts[1] || '',
+            year: parts[0] || ''
         };
     }
 
@@ -180,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
             kegiatan_nama: kegiatanNama.value,
             kegiatan_haritanggal: kegiatanHariTanggal.value,
             kegiatan_waktu: kegiatanWaktu.value,
+            kegiatan_tempat: kegiatanTempat.value,
             pegawai_jumlah: pegawaiList.length,
             pegawai: pegawaiList
         };
@@ -271,6 +272,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         kegiatanNama.value = d.kegiatan_nama;
                         kegiatanHariTanggal.value = d.kegiatan_haritanggal;
                         kegiatanWaktu.value = d.kegiatan_waktu;
+                        kegiatanTempat.value = d.kegiatan_tempat || '';
 
                         pegawaiContainer.innerHTML = "";
                         if (d.pegawai) {
@@ -290,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
             }
         } else if (action.classList.contains('btn-generate')) {
-            window.location.href = '/api/surat-tugas/generate/' + rowData.id;
+            window.open('/api/surat-tugas/generate/' + rowData.id, '_blank');
         } else if (action.classList.contains('btn-debug')) {
             fetch('/api/surat-tugas/' + rowData.id)
                 .then(function (res) { return res.json(); })
@@ -311,6 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         msg += '--- Detail Kegiatan ---\n';
                         msg += 'kegiatan_nama: ' + d.kegiatan_nama + '\n';
                         msg += 'kegiatan_haritanggal: ' + d.kegiatan_haritanggal + '\n';
+                        msg += 'kegiatan_tempat: ' + d.kegiatan_tempat + '\n';
                         msg += 'kegiatan_waktu: ' + d.kegiatan_waktu + '\n\n';
                         msg += '--- Pegawai (jumlah: ' + d.pegawai_jumlah + ') ---\n';
                         if (d.pegawai && d.pegawai.length > 0) {
