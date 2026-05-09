@@ -14,9 +14,7 @@
     "@xmldom/xmldom": "^0.9.10",
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
-    "docxtemplater": "^3.68.7",
     "express": "^5.2.1",
-    "pizzip": "^3.2.0",
     "sqlite3": "^6.0.1"
   }
 }

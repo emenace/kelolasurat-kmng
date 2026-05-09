@@ -1,9 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs');
-const PizZip = require('pizzip');
-const Docxtemplater = require('docxtemplater');
 
 const db = require('./database');
 const dbPegawai = require('./database_pegawai');
@@ -467,7 +464,7 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
         <table>
             <tr><td>Hari, Tanggal</td><td>:</td><td>${formatDateID(row.kegiatan_haritanggal)}</td></tr>
             <tr><td>Tempat</td><td>:</td><td>${row.kegiatan_tempat || '...'}</td></tr>
-            <tr><td>Waktu</td><td>:</td><td>${row.kegiatan_waktu || '...'}</td></tr>
+            <tr><td>Waktu</td><td>:</td><td>${row.kegiatan_waktu || '...'} WIB </td></tr>
         </table>
     </div>
 
