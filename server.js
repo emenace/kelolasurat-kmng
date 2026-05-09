@@ -233,30 +233,110 @@ app.delete('/api/surat-tugas/:id', (req, res) => {
     });
 });
 
+// Helper: merge split text runs in Word XML so that template tags like
+// {pegawai.nama[1]} that Word splits across multiple <w:t> elements
+// become single continuous strings we can find-and-replace.
+function mergeDocxTextRuns(xml) {
+    // This regex finds sequences of </w:t></w:r><w:r ...><w:rPr>...</w:rPr><w:t ...>
+    // and merges them into a single text run, preserving only the first run's formatting.
+    // We do multiple passes to handle deeply split tags.
+    for (let i = 0; i < 10; i++) {
+        const before = xml;
+        xml = xml.replace(
+            /(<w:t[^>]*>)([^<]*)<\/w:t><\/w:r>(?:<w:proofErr[^\/]*\/>)*<w:r[^>]*><w:rPr>[^]*?<\/w:rPr><w:t[^>]*>([^<]*)/g,
+            '$1$2$3'
+        );
+        if (xml === before) break;
+    }
+    return xml;
+}
+
 app.get('/api/surat-tugas/generate/:id', (req, res) => {
     dbSuratTugas.get('SELECT * FROM surat_tugas WHERE id = ?', [req.params.id], (err, row) => {
         if (err || !row) return res.status(400).json({"error": "Data not found"});
         dbSuratTugas.all('SELECT * FROM surat_tugas_pegawai WHERE surat_tugas_id = ?', [req.params.id], (err, pegawaiRows) => {
             if (err) return res.status(400).json({"error": err.message});
-            row.pegawai = pegawaiRows;
 
             try {
-                // Read the dynamic template we generated
-                const content = fs.readFileSync(path.resolve(__dirname, 'template_dynamic.docx'), 'binary');
+                // Read ORIGINAL template
+                const content = fs.readFileSync(path.resolve(__dirname, 'template.docx'));
                 const zip = new PizZip(content);
-                const doc = new Docxtemplater(zip, {
-                    paragraphLoop: true,
-                    linebreaks: true,
-                });
-                doc.render(row);
-                const buf = doc.getZip().generate({ type: 'nodebuffer' });
-                
+                let xml = zip.file('word/document.xml').asText();
+
+                // Step 1: Merge split text runs
+                xml = mergeDocxTextRuns(xml);
+
+                // Step 2: Find the table row (<w:tr>) containing {pegawai.nama[1]}
+                // and duplicate it for each employee
+                const rowRegex = /(<w:tr\b[^>]*>)([\s\S]*?{pegawai\.nama\[1\]}[\s\S]*?)(<\/w:tr>)/;
+                const rowMatch = xml.match(rowRegex);
+
+                if (rowMatch) {
+                    const templateRow = rowMatch[0]; // Full <w:tr>...</w:tr>
+
+                    // Also find and remove the [2] row if it exists
+                    const row2Regex = /<w:tr\b[^>]*>[\s\S]*?{pegawai\.nama\[2\]}[\s\S]*?<\/w:tr>/;
+                    xml = xml.replace(row2Regex, '');
+
+                    // Build replacement rows for each employee
+                    let allRows = '';
+                    for (let i = 0; i < pegawaiRows.length; i++) {
+                        let r = templateRow;
+                        const p = pegawaiRows[i];
+                        // Replace [1] tags with this employee's data
+                        r = r.replace(/\{pegawai\.nama\[1\]\}/g, p.nama || '');
+                        r = r.replace(/\{pegawai\.nip\[1\]\}/g, p.nip || '');
+                        r = r.replace(/\{pegawai\.pangkat\[1\]\}/g, p.pangkat || '');
+                        r = r.replace(/\{pegawai\.golongan\[1\]\}/g, p.golongan || '');
+                        r = r.replace(/\{pegawai\.jabatan\[1\]\}/g, p.jabatan || '');
+                        // Replace "1." numbering with actual number
+                        r = r.replace(/>1\.\s*</g, '>' + (i + 1) + '. <');
+                        allRows += r;
+                    }
+
+                    // Replace original [1] row with all generated rows
+                    xml = xml.replace(rowRegex, allRows);
+                } else {
+                    // Fallback: if no row pattern found, just do flat replacements
+                    for (let i = 0; i < pegawaiRows.length; i++) {
+                        const idx = i + 1;
+                        const p = pegawaiRows[i];
+                        xml = xml.replace(new RegExp('\\{pegawai\\.nama\\[' + idx + '\\]\\}', 'g'), p.nama || '');
+                        xml = xml.replace(new RegExp('\\{pegawai\\.nip\\[' + idx + '\\]\\}', 'g'), p.nip || '');
+                        xml = xml.replace(new RegExp('\\{pegawai\\.pangkat\\[' + idx + '\\]\\}', 'g'), p.pangkat || '');
+                        xml = xml.replace(new RegExp('\\{pegawai\\.golongan\\[' + idx + '\\]\\}', 'g'), p.golongan || '');
+                        xml = xml.replace(new RegExp('\\{pegawai\\.jabatan\\[' + idx + '\\]\\}', 'g'), p.jabatan || '');
+                    }
+                }
+
+                // Step 3: Replace other simple variables
+                xml = xml.replace(/\{surat_nomor\}/g, row.surat_nomor || '');
+                xml = xml.replace(/\{surat_tanggal\}/g, row.surat_tanggal || '');
+                xml = xml.replace(/\{surat_bulan\}/g, row.surat_bulan || '');
+                xml = xml.replace(/\{surat_tahun\}/g, row.surat_tahun || '');
+                xml = xml.replace(/\{dasar_pengirim\}/g, row.dasar_pengirim || '');
+                xml = xml.replace(/\{dasar_nomor\}/g, row.dasar_nomor || '');
+                xml = xml.replace(/\{dasar_tanggal\}/g, row.dasar_tanggal || '');
+                xml = xml.replace(/\{dasar_perihal\}/g, row.dasar_perihal || '');
+                xml = xml.replace(/\{kegiatan_nama\}/g, row.kegiatan_nama || '');
+                xml = xml.replace(/\{kegiatan_haritanggal\}/g, row.kegiatan_haritanggal || '');
+                xml = xml.replace(/\{kegiatan_waktu\}/g, row.kegiatan_waktu || '');
+                xml = xml.replace(/\{kegiatan_tempat\}/g, row.kegiatan_tempat || '');
+                xml = xml.replace(/\{pegawai_jumlah\}/g, String(row.pegawai_jumlah || pegawaiRows.length));
+
+                // Step 4: Clean up any remaining unfilled pegawai placeholders
+                xml = xml.replace(/\{pegawai\.\w+\[\d+\]\}/g, '');
+
+                // Step 5: Write back and send
+                zip.file('word/document.xml', xml);
+                const buf = zip.generate({ type: 'nodebuffer' });
+
                 res.setHeader('Content-Disposition', `attachment; filename="Surat_Tugas_${row.surat_nomor || row.id}.docx"`);
                 res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
                 res.send(buf);
             } catch (e) {
-                console.error(e);
-                res.status(500).json({"error": "Failed to generate document"});
+                console.error('Generate error:', e);
+                res.status(500).json({"error": "Failed to generate document: " + e.message});
             }
         });
     });

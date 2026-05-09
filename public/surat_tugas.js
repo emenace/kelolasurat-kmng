@@ -221,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return '<div class="d-flex gap-1 justify-content-center">'
             + '<button class="btn btn-sm btn-primary btn-edit" title="Edit"><i class="bi bi-pencil"></i></button>'
             + '<button class="btn btn-sm btn-warning btn-generate" title="Generate Docx"><i class="bi bi-file-word"></i></button>'
+            + '<button class="btn btn-sm btn-info btn-debug" title="Debug"><i class="bi bi-bug"></i></button>'
             + '<button class="btn btn-sm btn-danger btn-delete" title="Hapus"><i class="bi bi-trash"></i></button>'
             + '</div>';
     };
@@ -233,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function () {
         placeholder: "Tidak ada data",
         columns: [
             { title: "No", formatter: "rownum", hozAlign: "center", width: 60, headerSort: false },
-            { title: "Aksi", formatter: actionFormatter, hozAlign: "center", width: 230, headerSort: false },
+            { title: "Aksi", formatter: actionFormatter, hozAlign: "center", width: 280, headerSort: false },
             { title: "Nomor Surat", field: "surat_nomor", sorter: "string", minWidth: 120 },
             { title: "Nama Kegiatan", field: "kegiatan_nama", sorter: "string", minWidth: 200 },
             { title: "Tgl Kegiatan", field: "kegiatan_haritanggal", sorter: "string", minWidth: 120 },
@@ -290,6 +291,43 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } else if (action.classList.contains('btn-generate')) {
             window.location.href = '/api/surat-tugas/generate/' + rowData.id;
+        } else if (action.classList.contains('btn-debug')) {
+            fetch('/api/surat-tugas/' + rowData.id)
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data.message === "success") {
+                        var d = data.data;
+                        var msg = '=== DEBUG: Seluruh Variabel Tersimpan ===\n\n';
+                        msg += '--- Data Surat ---\n';
+                        msg += 'surat_nomor: ' + d.surat_nomor + '\n';
+                        msg += 'surat_tanggal: ' + d.surat_tanggal + '\n';
+                        msg += 'surat_bulan: ' + d.surat_bulan + '\n';
+                        msg += 'surat_tahun: ' + d.surat_tahun + '\n\n';
+                        msg += '--- Dasar Surat ---\n';
+                        msg += 'dasar_pengirim: ' + d.dasar_pengirim + '\n';
+                        msg += 'dasar_nomor: ' + d.dasar_nomor + '\n';
+                        msg += 'dasar_tanggal: ' + d.dasar_tanggal + '\n';
+                        msg += 'dasar_perihal: ' + d.dasar_perihal + '\n\n';
+                        msg += '--- Detail Kegiatan ---\n';
+                        msg += 'kegiatan_nama: ' + d.kegiatan_nama + '\n';
+                        msg += 'kegiatan_haritanggal: ' + d.kegiatan_haritanggal + '\n';
+                        msg += 'kegiatan_waktu: ' + d.kegiatan_waktu + '\n\n';
+                        msg += '--- Pegawai (jumlah: ' + d.pegawai_jumlah + ') ---\n';
+                        if (d.pegawai && d.pegawai.length > 0) {
+                            d.pegawai.forEach(function (p, idx) {
+                                msg += '\nPegawai [' + (idx + 1) + ']:\n';
+                                msg += '  nama: ' + p.nama + '\n';
+                                msg += '  nip: ' + p.nip + '\n';
+                                msg += '  pangkat: ' + p.pangkat + '\n';
+                                msg += '  golongan: ' + p.golongan + '\n';
+                                msg += '  jabatan: ' + p.jabatan + '\n';
+                            });
+                        } else {
+                            msg += '(tidak ada data pegawai)\n';
+                        }
+                        alert(msg);
+                    }
+                });
         }
     });
 
