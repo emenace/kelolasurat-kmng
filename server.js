@@ -335,17 +335,18 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
         align-items: center;
         border-bottom: 3px solid #000;
         padding-bottom: 8px;
+        padding-top: -20px;
         margin-bottom: 14px;
     }
-    .kop-surat img { width: 70px; height: 70px; margin-right: 14px; }
+    .kop-surat img { width: 90px; height: 80px; margin-right: 8px; }
     .kop-surat .kop-text { text-align: center; flex: 1; }
-    .kop-surat .kop-text h2 { font-size: 14pt; margin-bottom: 1px; letter-spacing: 1px; }
-    .kop-surat .kop-text h3 { font-size: 12pt; margin-bottom: 2px; }
+    .kop-surat .kop-text h2 { font-size: 14pt; font-weight:bold; margin-bottom: 1px; }
+    .kop-surat .kop-text h3 { font-size: 12pt; font-weight:bold; margin-bottom: 2px; }
     .kop-surat .kop-text p { font-size: 9pt; margin: 0; }
 
     /* Title */
     .title-section { text-align: center; margin: 18px 0 4px 0; }
-    .title-section h3 { font-size: 13pt; font-weight:normal; letter-spacing: 1px; }
+    .title-section h3 { font-size: 13pt; font-weight:normal; }
     .title-section p { font-size: 11pt; margin-top: 2px; }
 
     /* Content */
@@ -431,7 +432,7 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
 
 <div class="no-print">
     <button class="btn-back" onclick="history.back()">← Kembali</button>
-    <button class="btn-print" onclick="downloadPDF()">⬇️ Download PDF</button>
+    <button class="btn-print" onclick="downloadPDF()">⬇ Download PDF</button>
 </div>
 
 <div class="page">
