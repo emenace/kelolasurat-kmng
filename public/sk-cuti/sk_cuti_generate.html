@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK Cuti</title>
+    <style>
+        @font-face {
+            font-family: 'Bookman Old Style';
+            src: url('../assets/bokos.ttf') format('truetype');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Bookman Old Style';
+            background: #e0e0e0;
+            color: #000;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 20px auto;
+            padding: 10mm 20mm;
+            background: #fff;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .no-print {
+            text-align: center;
+            padding: 16px;
+            background: #333;
+            color: #fff;
+        }
+
+        .no-print button {
+            padding: 10px 28px;
+            font-size: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0 6px;
+        }
+
+        .btn-print {
+            background: #2196F3;
+            color: #fff;
+        }
+
+        .btn-back {
+            background: #777;
+            color: #fff;
+        }
+
+        /* Header */
+        .kop-surat {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .kop-surat h2 {
+            font-size: 13pt;
+            margin: 0;
+
+            font-weight: normal;
+        }
+
+        .kop-surat h3 {
+            font-size: 12pt;
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .kop-surat .nomor-line {
+            font-size: 11pt;
+            margin-top: 4px;
+        }
+
+        /* Title */
+        .title-section {
+            text-align: center;
+            margin: 0px 0 0px 0;
+            font-size: 11pt;
+            letter-spacing: 2px;
+            font-weight: normal;
+        }
+
+        .subtitle-section {
+            text-align: center;
+            font-size: 11pt;
+            margin-bottom: 2px;
+            font-weight: normal;
+        }
+
+        /* Content */
+        .content {
+            font-size: 11pt;
+            line-height: 1.2;
+            margin-top: 5px;
+        }
+
+        .content table.info-table {
+            width: 100%;
+        }
+
+        .content table.info-table td {
+            vertical-align: top;
+            padding: 2px 6px;
+        }
+
+        .content table.info-table td:first-child {
+            width: 100px;
+        }
+
+        .content table.info-table td:nth-child(2) {
+            width: 10px;
+            text-align: center;
+        }
+
+        .content .sub-list {
+            padding-left: 20px;
+        }
+
+        .content .sub-list li {
+            margin-bottom: 4px;
+        }
+
+        /* Memutuskan */
+        .memutuskan {
+            text-align: center;
+            font-size: 11pt;
+            margin: 8px 0 8px 0;
+            letter-spacing: 1px;
+            font-weight: normal;
+        }
+
+        /* Menetapkan */
+        .menetapkan-table {
+            width: 100%;
+            font-size: 11pt;
+            line-height: 1.0;
+            font-weight: normal;
+        }
+
+        .menetapkan-table td {
+            vertical-align: top;
+            padding: 0px 6px;
+        }
+
+        .menetapkan-table td:first-child {
+            width: 90px;
+            font-weight: normal;
+        }
+
+        .menetapkan-table td:nth-child(2) {
+            width: 10px;
+            text-align: center;
+        }
+
+        .kesatu-detail td {
+            vertical-align: top;
+            padding: 1px 6px;
+        }
+
+        .kesatu-detail td:first-child {
+            width: 130px;
+            padding-left: 40px;
+        }
+
+        .kesatu-detail td:nth-child(2) {
+            width: 10px;
+            text-align: center;
+        }
+
+        /* Footer: Signature */
+        .footer-section {
+            margin-top: 20px;
+            text-align: right;
+            font-size: 11pt;
+            line-height: 1;
+        }
+
+        .footer-section .sign-block {
+            display: inline-block;
+            text-align: left;
+            margin-right: 20px;
+        }
+
+        .footer-section .sign-block .stamp-wrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        .footer-section .sign-block .stamp-wrap img {
+            width: 200px;
+            margin: -10px 0 1px -60px;
+        }
+
+        /* Tembusan */
+        .tembusan {
+            font-size: 11pt;
+            margin-top: 10px;
+            line-height: 1.2;
+        }
+
+        .tembusan ol {
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .page {
+                width: 100%;
+                margin: 0;
+                padding: 15mm 20mm 20mm 20mm;
+                box-shadow: none;
+                min-height: auto;
+            }
+
+            @page {
+                size: A4;
+                margin: 0;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div style="text-align: center; margin-top: 50px; font-family: Arial;">Memuat dokumen...</div>
+    </div>
+    <script src="sk_cuti_generate.js"></script>
+</body>
+
+</html>

@@ -6,6 +6,7 @@ const fs = require('fs');
 const db = require('./database/logic/database');
 const dbPegawai = require('./database/logic/database_pegawai');
 const dbSuratTugas = require('./database/logic/database_surattugas');
+const dbSKCuti = require('./database/logic/database_skcuti');
 
 const app = express();
 const port = 3000;
@@ -252,6 +253,53 @@ app.delete('/api/surat-tugas/:id', (req, res) => {
 });
 
 
+// --- API for SK Cuti ---
+
+app.get('/api/sk-cuti', (req, res) => {
+    dbSKCuti.all('SELECT * FROM sk_cuti ORDER BY id DESC', [], (err, rows) => {
+        if (err) return res.status(400).json({ "error": err.message });
+        res.json({ "message": "success", "data": rows });
+    });
+});
+
+app.get('/api/sk-cuti/:id', (req, res) => {
+    dbSKCuti.get('SELECT * FROM sk_cuti WHERE id = ?', [req.params.id], (err, row) => {
+        if (err) return res.status(400).json({ "error": err.message });
+        if (!row) return res.status(404).json({ "error": "Not found" });
+        res.json({ "message": "success", "data": row });
+    });
+});
+
+app.post('/api/sk-cuti', (req, res) => {
+    const d = req.body;
+    dbSKCuti.run(
+        `INSERT INTO sk_cuti (cuti_nomor, cuti_createdate, cuti_tahun, cuti_alasan, cuti_startdate, cuti_enddate, cuti_daylong, pegawai_nama, pegawai_nip, pegawai_pangkat, pegawai_golongan, pegawai_jabatan, atasan_nama, atasan_nip) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [d.cuti_nomor, d.cuti_createdate, d.cuti_tahun, d.cuti_alasan, d.cuti_startdate, d.cuti_enddate, d.cuti_daylong, d.pegawai_nama, d.pegawai_nip, d.pegawai_pangkat, d.pegawai_golongan, d.pegawai_jabatan, d.atasan_nama, d.atasan_nip],
+        function (err) {
+            if (err) return res.status(400).json({ "error": err.message });
+            res.json({ "message": "success", "data": { id: this.lastID } });
+        }
+    );
+});
+
+app.put('/api/sk-cuti/:id', (req, res) => {
+    const d = req.body;
+    dbSKCuti.run(
+        `UPDATE sk_cuti SET cuti_nomor=?, cuti_createdate=?, cuti_tahun=?, cuti_alasan=?, cuti_startdate=?, cuti_enddate=?, cuti_daylong=?, pegawai_nama=?, pegawai_nip=?, pegawai_pangkat=?, pegawai_golongan=?, pegawai_jabatan=?, atasan_nama=?, atasan_nip=? WHERE id=?`,
+        [d.cuti_nomor, d.cuti_createdate, d.cuti_tahun, d.cuti_alasan, d.cuti_startdate, d.cuti_enddate, d.cuti_daylong, d.pegawai_nama, d.pegawai_nip, d.pegawai_pangkat, d.pegawai_golongan, d.pegawai_jabatan, d.atasan_nama, d.atasan_nip, req.params.id],
+        function (err) {
+            if (err) return res.status(400).json({ "error": err.message });
+            res.json({ "message": "success" });
+        }
+    );
+});
+
+app.delete('/api/sk-cuti/:id', (req, res) => {
+    dbSKCuti.run('DELETE FROM sk_cuti WHERE id=?', [req.params.id], function (err) {
+        if (err) return res.status(400).json({ "error": err.message });
+        res.json({ "message": "success" });
+    });
+});
 
 // Start server
 app.listen(port, () => {
