@@ -11,9 +11,9 @@ function formatDateID(dateStr) {
 }
 
 // Function to trigger PDF download
-window.downloadPDF = function(suratNomor) {
+window.downloadPDF = function (suratNomor) {
     const element = document.querySelector('.page');
-    
+
     const originalPadding = element.style.padding;
     const originalMargin = element.style.margin;
     const originalBoxShadow = element.style.boxShadow;
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch(`/api/surat-tugas/${id}`);
         const result = await response.json();
-        
+
         if (!response.ok || !result.data) {
             throw new Error(result.error || 'Data tidak ditemukan');
         }
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <!-- DETAIL KEGIATAN -->
     <div class="detail-kegiatan">
         <p>Untuk mengikuti ${row.kegiatan_nama || '...'}, pada ;</p>
-        <table>
+        <table style="margin-top: 10px;">
             <tr><td>Hari, Tanggal</td><td>:</td><td>${formatDateID(row.kegiatan_haritanggal)}</td></tr>
             <tr><td>Waktu</td><td>:</td><td>${row.kegiatan_waktu || '...'} WIB </td></tr>
             <tr><td>Tempat</td><td>:</td><td>${row.kegiatan_tempat || '...'}</td></tr>

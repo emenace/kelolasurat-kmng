@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p>Tembusan:</p>
         <ol>
             <li>KPPN Kota Metro</li>
-            <li>Yang Bersangkutan</li>
+            <li>Yang Bersangkutan </li>
         </ol>
     </div>
 </div>
