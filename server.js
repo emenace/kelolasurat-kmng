@@ -375,11 +375,12 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        margin-top: 20px;
+        margin-top: 60px;
     }
     .qr-code img {
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
+        margin: 0px 0px 80px 0px;
     }
     .signature-right {
         text-align: left;
