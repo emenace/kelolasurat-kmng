@@ -387,7 +387,7 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
     }
     .signature-right .stamp-wrap {
         display: flex;
-        justify-content: right;
+        justify-content: center;
     }
     .signature-right .stamp-wrap img {
         width: 220px;
