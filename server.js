@@ -304,13 +304,14 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
         color: #000;
     }
     .page {
-        width: 8.5in;
-        min-height: 13in;
+        width: 215.9mm;
+        min-height: 330.2mm;
         margin: 20px auto;
-        padding: 15mm 20mm 20mm 20mm;
+        padding: 10mm 20mm;
         background: #fff;
         box-shadow: 0 2px 16px rgba(0,0,0,0.18);
         position: relative;
+        box-sizing: border-box;
     }
     .no-print {
         text-align: center;
@@ -335,7 +336,6 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
         align-items: center;
         border-bottom: 3px solid #000;
         padding-bottom: 8px;
-        padding-top: -20px;
         margin-bottom: 14px;
     }
     .kop-surat img { width: 90px; height: 80px; margin-right: 8px; }
@@ -418,14 +418,33 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
 <script>
     function downloadPDF() {
         const element = document.querySelector('.page');
+        
+        const originalPadding = element.style.padding;
+        const originalMargin = element.style.margin;
+        const originalBoxShadow = element.style.boxShadow;
+        const originalWidth = element.style.width;
+        const originalMinHeight = element.style.minHeight;
+
+        element.style.padding = '0';
+        element.style.margin = '0';
+        element.style.boxShadow = 'none';
+        element.style.width = '175.9mm';
+        element.style.minHeight = 'auto';
+
         const opt = {
-            margin: 0,
+            margin: [10, 20, 20, 20],
             filename: 'Surat_Tugas_${row.surat_nomor || "Draft"}.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: [8.5, 13], orientation: 'portrait' }
+            jsPDF: { unit: 'mm', format: [215.9, 330.2], orientation: 'portrait' }
         };
-        html2pdf().set(opt).from(element).save();
+        html2pdf().set(opt).from(element).save().then(() => {
+            element.style.padding = originalPadding;
+            element.style.margin = originalMargin;
+            element.style.boxShadow = originalBoxShadow;
+            element.style.width = originalWidth;
+            element.style.minHeight = originalMinHeight;
+        });
     }
 </script>
 </head>
@@ -434,6 +453,7 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
 <div class="no-print">
     <button class="btn-back" onclick="history.back()">← Kembali</button>
     <button class="btn-print" onclick="downloadPDF()">⬇ Download PDF</button>
+    <button class="btn-print" style="background: #4CAF50;" onclick="window.print()">⎙ Cetak (Browser)</button>
 </div>
 
 <div class="page">
@@ -483,9 +503,9 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
         <thead>
             <tr>
                 <th style="width:40px;">No.</th>
-                <th>Nama / NIP</th>
-                <th>Pangkat / Golongan</th>
-                <th>Jabatan</th>
+                <th style="width:30%;">Nama / NIP</th>
+                <th style="width:25%;">Pangkat / Golongan</th>
+                <th style="width:40%;">Jabatan</th>
             </tr>
         </thead>
         <tbody>
