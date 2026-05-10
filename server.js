@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const db = require('./database');
 const dbPegawai = require('./database_pegawai');
@@ -256,6 +257,23 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
         dbSuratTugas.all('SELECT * FROM surat_tugas_pegawai WHERE surat_tugas_id = ?', [req.params.id], (err, pegawaiRows) => {
             if (err) return res.status(400).json({ "error": err.message });
 
+            // Helper to get base64 image
+            function getBase64Image(filename) {
+                try {
+                    const filePath = path.join(__dirname, 'public', filename);
+                    const fileData = fs.readFileSync(filePath);
+                    const extension = path.extname(filename).replace('.', '');
+                    return `data:image/${extension === 'jpg' ? 'jpeg' : extension};base64,${fileData.toString('base64')}`;
+                } catch (e) {
+                    console.error(`Error reading ${filename}:`, e);
+                    return '';
+                }
+            }
+
+            const logoBase64 = getBase64Image('Kementerian_Agama_new_logo.png');
+            const qrBase64 = getBase64Image('qr_st.png');
+            const stampBase64 = getBase64Image('stamp.png');
+
             // Build pegawai table rows
             let pegawaiTableRows = '';
             for (let i = 0; i < pegawaiRows.length; i++) {
@@ -404,7 +422,7 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
 <div class="page">
     <!-- KOP SURAT -->
     <div class="kop-surat">
-        <img src="/Kementerian_Agama_new_logo.png" alt="Logo">
+        <img src="${logoBase64}" alt="Logo">
         <div class="kop-text">
             <h2>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h2>
             <h3>KANTOR KEMENTERIAN AGAMA KOTA METRO</h3>
@@ -478,12 +496,12 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
     <!-- QR + TANDA TANGAN -->
     <div class="footer-section">
         <div class="qr-code">
-            <img src="/qr_st.png" alt="QR Code">
+            <img src="${qrBase64}" alt="QR Code">
         </div>
         <div class="signature-right">
             <p>Metro, ${formatDateID(row.surat_tanggal)}</p>
             <p>Kepala</p>
-            <div class="stamp-wrap"><img src="/stamp.png" alt="Stempel dan Tanda Tangan"></div>
+            <div class="stamp-wrap"><img src="${stampBase64}" alt="Stempel dan Tanda Tangan"></div>
             <p>Abdul Haris</p>
         </div>
     </div>
