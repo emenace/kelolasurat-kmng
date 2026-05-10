@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 <div class="page">
     <!-- KOP SURAT -->
     <div class="kop-surat">
-        <img src="Kementerian_Agama_new_logo.png" alt="Logo">
+        <img src="../assets/Kementerian_Agama_new_logo.png" alt="Logo">
         <div class="kop-text">
             <h2>KEMENTERIAN AGAMA REPUBLIK INDONESIA</h2>
             <h3>KANTOR KEMENTERIAN AGAMA KOTA METRO</h3>
@@ -157,12 +157,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     <!-- QR + TANDA TANGAN -->
     <div class="footer-section">
         <div class="qr-code">
-            <img src="qr_st.png" alt="QR Code">
+            <img src="../assets/qr_st.png" alt="QR Code">
         </div>
         <div class="signature-right">
             <p>Metro, ${formatDateID(row.surat_tanggal)}</p>
             <p>Kepala</p>
-            <div class="stamp-wrap"><img src="stampel.png" alt="Tandatangan"></div>
+            <div class="stamp-wrap"><img src="../assets/stampel.png" alt="Tandatangan"></div>
             <p>Abdul Haris</p>
         </div>
     </div>

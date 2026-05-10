@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
             }
         } else if (action.classList.contains('btn-generate')) {
-            window.open('/surat_tugas_generate.html?id=' + rowData.id, '_blank');
+            window.open('surat_tugas_generate.html?id=' + rowData.id, '_blank');
         } else if (action.classList.contains('btn-debug')) {
             fetch('/api/surat-tugas/' + rowData.id)
                 .then(function (res) { return res.json(); })

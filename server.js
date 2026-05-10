@@ -3,9 +3,9 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
-const db = require('./database');
-const dbPegawai = require('./database_pegawai');
-const dbSuratTugas = require('./database_surattugas');
+const db = require('./database/logic/database');
+const dbPegawai = require('./database/logic/database_pegawai');
+const dbSuratTugas = require('./database/logic/database_surattugas');
 
 const app = express();
 const port = 3000;
