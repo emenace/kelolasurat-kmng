@@ -1,137 +1,257 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Surat Tugas</title>
-<style>
-    @font-face {
-        font-family: 'Arial';
-        src: url('../assets/Arial.ttf') format('truetype');
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        background: #e0e0e0;
-        color: #000;
-    }
-    .page {
-        width: 215.9mm;
-        min-height: 330.2mm;
-        margin: 20px auto;
-        padding: 10mm 20mm;
-        background: #fff;
-        box-shadow: 0 2px 16px rgba(0,0,0,0.18);
-        position: relative;
-        box-sizing: border-box;
-    }
-    .no-print {
-        text-align: center;
-        padding: 16px;
-        background: #333;
-        color: #fff;
-    }
-    .no-print button {
-        padding: 10px 28px;
-        font-size: 15px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        margin: 0 6px;
-    }
-    .btn-print { background: #2196F3; color: #fff; }
-    .btn-back { background: #777; color: #fff; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surat Tugas</title>
+    <style>
+        @font-face {
+            font-family: 'Arial';
+            src: url('../assets/Arial.ttf') format('truetype');
+        }
 
-    /* Header */
-    .kop-surat {
-        display: flex;
-        align-items: center;
-        border-bottom: 3px solid #000;
-        padding-bottom: 8px;
-        margin-bottom: 14px;
-    }
-    .kop-surat img { width: 90px; height: 80px; margin-right: 8px; }
-    .kop-surat .kop-text { text-align: center; flex: 1; }
-    .kop-surat .kop-text h2 { font-size: 14pt; font-weight:bold; margin-bottom: 1px; }
-    .kop-surat .kop-text h3 { font-size: 12pt; font-weight:bold; margin-bottom: 2px; }
-    .kop-surat .kop-text p { font-size: 9pt; margin: 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* Title */
-    .title-section { text-align: center; margin: 18px 0 4px 0; }
-    .title-section h3 { font-size: 13pt; font-weight:normal; }
-    .title-section p { font-size: 11pt; margin-top: 2px; }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #e0e0e0;
+            color: #000;
+        }
 
-    /* Content */
-    .content { font-size: 11pt; line-height: 1.7; margin-top: 16px; }
-    .content table.info-table td { vertical-align: top; padding: 2px 6px; }
-    .content table.info-table td:first-child { width: 90px; }
-    .content table.info-table td:nth-child(2) { width: 10px; text-align: center; }
-
-    /* Pegawai Table */
-    .memberi-tugas { text-align: center; font-weight: normal; font-size: 11pt; margin: 18px 0 6px 0; }
-    .kepada { font-size: 11pt; margin-bottom: 4px; }
-    table.pegawai-table { width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 14px; }
-    table.pegawai-table th { background: #f5f5f5; border: 0.5px solid #000; padding: 6px 8px; font-weight: normal; text-align: center; }
-
-    /* Detail kegiatan */
-    .detail-kegiatan { font-size: 11pt; line-height: 1.6; margin-bottom: 14px; }
-    .detail-kegiatan table td { padding: 1px 6px; vertical-align: top; }
-    .detail-kegiatan table td:first-child { width: 110px; }
-    .detail-kegiatan table td:nth-child(2) { width: 10px; }
-
-    /* Closing */
-    .closing { font-size: 11pt; line-height: 1.7; margin-bottom: 20px; }
-
-    /* Footer: QR + Signature */
-    .footer-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-top: 60px;
-    }
-    .qr-code img {
-        width: 80px;
-        height: 80px;
-        margin: 0px 0px 80px 0px;
-    }
-    .signature-right {
-        text-align: left;
-        font-size: 11pt;
-        line-height: 1.6;
-        margin-right: 50px;
-    }
-    .signature-right .stamp-wrap {
-        display: flex;
-        justify-content: center;
-    }
-    .signature-right .stamp-wrap img {
-        width: 220px;
-        margin: -10px 0 1px -70px;
-    }
-
-    /* Print */
-    @media print {
-        body { background: #fff; }
-        .no-print { display: none !important; }
         .page {
+            width: 215.9mm;
+            min-height: 330.2mm;
+            margin: 20px auto;
+            padding: 10mm 20mm;
+            background: #fff;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .no-print {
+            text-align: center;
+            padding: 16px;
+            background: #333;
+            color: #fff;
+        }
+
+        .no-print button {
+            padding: 10px 28px;
+            font-size: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0 6px;
+        }
+
+        .btn-print {
+            background: #2196F3;
+            color: #fff;
+        }
+
+        .btn-back {
+            background: #777;
+            color: #fff;
+        }
+
+        /* Header */
+        .kop-surat {
+            display: flex;
+            align-items: center;
+            border-bottom: 3px solid #000;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+        }
+
+        .kop-surat img {
+            width: 90px;
+            height: 80px;
+            margin-right: 8px;
+        }
+
+        .kop-surat .kop-text {
+            text-align: center;
+            flex: 1;
+        }
+
+        .kop-surat .kop-text h2 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 1px;
+        }
+
+        .kop-surat .kop-text h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .kop-surat .kop-text p {
+            font-size: 9pt;
+            margin: 0;
+        }
+
+        /* Title */
+        .title-section {
+            text-align: center;
+            margin: 18px 0 4px 0;
+        }
+
+        .title-section h3 {
+            font-size: 13pt;
+            font-weight: normal;
+        }
+
+        .title-section p {
+            font-size: 11pt;
+            margin-top: 2px;
+        }
+
+        /* Content */
+        .content {
+            font-size: 11pt;
+            line-height: 1.7;
+            margin-top: 16px;
+        }
+
+        .content table.info-table td {
+            vertical-align: top;
+            padding: 2px 6px;
+        }
+
+        .content table.info-table td:first-child {
+            width: 90px;
+        }
+
+        .content table.info-table td:nth-child(2) {
+            width: 10px;
+            text-align: center;
+        }
+
+        /* Pegawai Table */
+        .memberi-tugas {
+            text-align: center;
+            font-weight: normal;
+            font-size: 11pt;
+            margin: 18px 0 6px 0;
+        }
+
+        .kepada {
+            font-size: 11pt;
+            margin-bottom: 4px;
+        }
+
+        table.pegawai-table {
             width: 100%;
-            margin: 0;
-            padding: 15mm 20mm 20mm 20mm;
-            box-shadow: none;
-            min-height: auto;
+            border-collapse: collapse;
+            font-size: 10pt;
+            margin-bottom: 14px;
         }
-        @page {
-            size: 8.5in 13in;
-            margin: 0;
+
+        table.pegawai-table th {
+            background: #f5f5f5;
+            border: 0.5px solid #000;
+            padding: 6px 8px;
+            font-weight: normal;
+            text-align: center;
         }
-    }
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+        /* Detail kegiatan */
+        .detail-kegiatan {
+            font-size: 11pt;
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .detail-kegiatan table td {
+            padding: 1px 6px;
+            vertical-align: top;
+        }
+
+        .detail-kegiatan table td:first-child {
+            width: 110px;
+        }
+
+        .detail-kegiatan table td:nth-child(2) {
+            width: 10px;
+        }
+
+        /* Closing */
+        .closing {
+            font-size: 11pt;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        /* Footer: QR + Signature */
+        .footer-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 60px;
+        }
+
+        .qr-code img {
+            width: 80px;
+            height: 80px;
+            margin: 0px 0px 80px 0px;
+        }
+
+        .signature-right {
+            text-align: left;
+            font-size: 11pt;
+            line-height: 1.6;
+            margin-right: 50px;
+        }
+
+        .signature-right .stamp-wrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        .signature-right .stamp-wrap img {
+            width: 250px;
+            margin: -8px 0 1px -100px;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .page {
+                width: 100%;
+                margin: 0;
+                padding: 15mm 20mm 20mm 20mm;
+                box-shadow: none;
+                min-height: auto;
+            }
+
+            @page {
+                size: 8.5in 13in;
+                margin: 0;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
+
 <body>
     <div id="app">
         <div style="text-align: center; margin-top: 50px; font-family: Arial;">Memuat dokumen...</div>
     </div>
     <script src="surat_tugas_generate.js"></script>
 </body>
+
 </html>
