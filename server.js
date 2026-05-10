@@ -384,6 +384,7 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
         text-align: left;
         font-size: 11pt;
         line-height: 1.6;
+        margin-right: 50px;
     }
     .signature-right .stamp-wrap {
         display: flex;
@@ -391,7 +392,7 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
     }
     .signature-right .stamp-wrap img {
         width: 220px;
-        margin: 1px 0 1px 0;
+        margin: -10px 0 1px -70px;
     }
 
     /* Print */
