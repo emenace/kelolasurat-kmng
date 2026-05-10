@@ -279,10 +279,10 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
             for (let i = 0; i < pegawaiRows.length; i++) {
                 const p = pegawaiRows[i];
                 pegawaiTableRows += '<tr>'
-                    + '<td style="text-align:center;vertical-align:top;padding:6px 8px;border:1px solid #000;">' + (i + 1) + '</td>'
-                    + '<td style="vertical-align:top;padding:6px 8px;border:1px solid #000;">' + (p.nama || '') + '<br>' + (p.nip || '') + '</td>'
-                    + '<td style="vertical-align:top;padding:6px 8px;border:1px solid #000;">' + (p.pangkat || '') + '<br>(' + (p.golongan || '') + ')</td>'
-                    + '<td style="vertical-align:top;padding:6px 8px;border:1px solid #000;">' + (p.jabatan || '') + '</td>'
+                    + '<td style="text-align:center;vertical-align:top;padding:6px 8px;border:0.5px solid #000;">' + (i + 1) + '</td>'
+                    + '<td style="vertical-align:top;padding:6px 8px;border:0.5px solid #000;">' + (p.nama || '') + '<br>' + (p.nip || '') + '</td>'
+                    + '<td style="vertical-align:top;padding:6px 8px;border:0.5px solid #000;">' + (p.pangkat || '') + '<br>(' + (p.golongan || '') + ')</td>'
+                    + '<td style="vertical-align:top;padding:6px 8px;border:0.5px solid #000;">' + (p.jabatan || '') + '</td>'
                     + '</tr>';
             }
 
@@ -345,7 +345,7 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
 
     /* Title */
     .title-section { text-align: center; margin: 18px 0 4px 0; }
-    .title-section h3 { font-size: 13pt; font-weight:bold; letter-spacing: 1px; }
+    .title-section h3 { font-size: 13pt; font-weight:normal; letter-spacing: 1px; }
     .title-section p { font-size: 11pt; margin-top: 2px; }
 
     /* Content */
@@ -355,10 +355,10 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
     .content table.info-table td:nth-child(2) { width: 10px; text-align: center; }
 
     /* Pegawai Table */
-    .memberi-tugas { text-align: center; font-weight: bold; font-size: 11pt; margin: 18px 0 6px 0; }
+    .memberi-tugas { text-align: center; font-weight: normal; font-size: 11pt; margin: 18px 0 6px 0; }
     .kepada { font-size: 11pt; margin-bottom: 4px; }
     table.pegawai-table { width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 14px; }
-    table.pegawai-table th { background: #f5f5f5; border: 1px solid #000; padding: 6px 8px; font-weight: bold; text-align: center; }
+    table.pegawai-table th { background: #f5f5f5; border: 0.5px solid #000; padding: 6px 8px; font-weight: normal; text-align: center; }
 
     /* Detail kegiatan */
     .detail-kegiatan { font-size: 11pt; line-height: 1.6; margin-bottom: 14px; }
@@ -412,12 +412,26 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
         }
     }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+    function downloadPDF() {
+        const element = document.querySelector('.page');
+        const opt = {
+            margin: 0,
+            filename: 'Surat_Tugas_${row.surat_nomor || "Draft"}.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: [8.5, 13], orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+</script>
 </head>
 <body>
 
 <div class="no-print">
-    <button class="btn-back" onclick="history.back()">\u2190 Kembali</button>
-    <button class="btn-print" onclick="window.print()">\uD83D\uDDA8\uFE0F Cetak / Simpan PDF</button>
+    <button class="btn-back" onclick="history.back()">← Kembali</button>
+    <button class="btn-print" onclick="downloadPDF()">⬇️ Download PDF</button>
 </div>
 
 <div class="page">
