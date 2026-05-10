@@ -272,7 +272,7 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
 
             const logoBase64 = getBase64Image('Kementerian_Agama_new_logo.png');
             const qrBase64 = getBase64Image('qr_st.png');
-            const stampBase64 = getBase64Image('stamp.png');
+            const stampBase64 = getBase64Image('stampel.png');
 
             // Build pegawai table rows
             let pegawaiTableRows = '';
@@ -345,7 +345,7 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
 
     /* Title */
     .title-section { text-align: center; margin: 18px 0 4px 0; }
-    .title-section h3 { font-size: 13pt; text-decoration: underline; letter-spacing: 2px; }
+    .title-section h3 { font-size: 13pt; font-weight:bold; letter-spacing: 1px; }
     .title-section p { font-size: 11pt; margin-top: 2px; }
 
     /* Content */
@@ -387,11 +387,11 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
     }
     .signature-right .stamp-wrap {
         display: flex;
-        justify-content: center;
+        justify-content: right;
     }
     .signature-right .stamp-wrap img {
         width: 220px;
-        margin: -10px 0 -10px 0;
+        margin: 1px 0 1px 0;
     }
 
     /* Print */
@@ -481,8 +481,8 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
         <p>Untuk mengikuti ${row.kegiatan_nama || '...'}, pada ;</p>
         <table>
             <tr><td>Hari, Tanggal</td><td>:</td><td>${formatDateID(row.kegiatan_haritanggal)}</td></tr>
-            <tr><td>Tempat</td><td>:</td><td>${row.kegiatan_tempat || '...'}</td></tr>
             <tr><td>Waktu</td><td>:</td><td>${row.kegiatan_waktu || '...'} WIB </td></tr>
+            <tr><td>Tempat</td><td>:</td><td>${row.kegiatan_tempat || '...'}</td></tr>
         </table>
     </div>
 
@@ -501,7 +501,7 @@ app.get('/api/surat-tugas/generate/:id', (req, res) => {
         <div class="signature-right">
             <p>Metro, ${formatDateID(row.surat_tanggal)}</p>
             <p>Kepala</p>
-            <div class="stamp-wrap"><img src="${stampBase64}" alt="Stempel dan Tanda Tangan"></div>
+            <div class="stamp-wrap"><img src="${stampBase64}" alt="Tandatangan"></div>
             <p>Abdul Haris</p>
         </div>
     </div>
