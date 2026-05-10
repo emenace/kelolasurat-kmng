@@ -1,17 +1,17 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Set default date to today
     document.getElementById('tanggal_surat').valueAsDate = new Date();
 
     // Custom formatter for action buttons
-    var actionFormatter = function(cell, formatterParams, onRendered){
-        return `<button class="btn btn-sm btn-primary btn-edit me-1" title="Edit"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-danger btn-delete" title="Hapus"><i class="bi bi-trash"></i></button>`;
+    var actionFormatter = function (cell, formatterParams, onRendered) {
+        return `<button class="btn btn-sm btn-primary btn-edit me-1" title="Edit"><i class="bi bi-pencil"></i> Edit</button>
+                <button class="btn btn-sm btn-danger btn-delete" title="Hapus"><i class="bi bi-trash"></i> Hapus</button>`;
     };
 
     // Initialize Tabulator
     var table = new Tabulator("#table-surat-keluar", {
-        ajaxURL: "/api/surat-keluar", 
-        ajaxResponse: function(url, params, response) {
+        ajaxURL: "/api/surat-keluar",
+        ajaxResponse: function (url, params, response) {
             let maxNo = 0;
             if (response.data && response.data.length > 0) {
                 response.data.forEach(row => {
@@ -22,45 +22,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
             document.getElementById('nomor_urut').placeholder = maxNo + 1;
-            return response.data; 
+            return response.data;
         },
-        pagination: "local",       
+        pagination: "local",
         paginationSize: 10,
         paginationSizeSelector: [10, 50, 100, true], // Add pagination size selector
-        movableColumns: true,      
+        movableColumns: false,
         columns: [
-            {title: "Nomor Urut", field: "nomor_urut", headerFilter: "input", width: 120},
-            {title: "Tanggal", field: "tanggal_surat", headerFilter: "input", width: 120},
-            {title: "Nomor Surat", field: "nomor_surat", headerFilter: "input", width: 150},
-            {title: "Asal Surat", field: "asal_surat", headerFilter: "input"},
-            {title: "Tujuan", field: "tujuan", headerFilter: "input"},
-            {title: "Isi Surat", field: "isi_surat", headerFilter: "input", formatter: "textarea"},
-            {title: "Keterangan", field: "keterangan", headerFilter: "input"},
-            {title: "Aksi", formatter: actionFormatter, width: 100, hozAlign: "center", headerSort: false, cellClick: function(e, cell){
-                var id = cell.getRow().getData().id;
-                var target = e.target.closest('button');
-                if(target && target.classList.contains('btn-edit')) {
-                    editData(cell.getRow().getData());
-                } else if(target && target.classList.contains('btn-delete')) {
-                    deleteData(id);
+            { title: "Nomor Urut", field: "nomor_urut", headerFilter: "input", width: 120 },
+            {
+                title: "Aksi", formatter: actionFormatter, hozAlign: "center", headerSort: false, cellClick: function (e, cell) {
+                    var id = cell.getRow().getData().id;
+                    var target = e.target.closest('button');
+                    if (target && target.classList.contains('btn-edit')) {
+                        editData(cell.getRow().getData());
+                    } else if (target && target.classList.contains('btn-delete')) {
+                        deleteData(id);
+                    }
                 }
-            }}
+            },
+            { title: "Tanggal", field: "tanggal_surat", headerFilter: "input", width: 120 },
+            { title: "Nomor Surat", field: "nomor_surat", headerFilter: "input", width: 150 },
+            { title: "Asal Surat", field: "asal_surat", headerFilter: "input" },
+            { title: "Tujuan", field: "tujuan", headerFilter: "input" },
+            { title: "Isi Surat", field: "isi_surat", headerFilter: "input" },
+            { title: "Keterangan", field: "keterangan", headerFilter: "input" },
+
         ],
     });
 
     // Global Search
-    document.getElementById("global-search").addEventListener("keyup", function(){
-        if(this.value) {
+    document.getElementById("global-search").addEventListener("keyup", function () {
+        if (this.value) {
             table.setFilter(customFilter, this.value);
         } else {
             table.clearFilter();
         }
     });
 
-    function customFilter(data, filterParams){
+    function customFilter(data, filterParams) {
         var value = filterParams.toLowerCase();
-        for(var key in data){
-            if(String(data[key]).toLowerCase().includes(value)){
+        for (var key in data) {
+            if (String(data[key]).toLowerCase().includes(value)) {
                 return true;
             }
         }
@@ -68,9 +71,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Handle form submission
-    document.getElementById('formSuratKeluar').addEventListener('submit', function(e) {
+    document.getElementById('formSuratKeluar').addEventListener('submit', function (e) {
         e.preventDefault();
-        
+
         const id_surat = document.getElementById('id_surat').value;
         const data = {
             nomor_urut: document.getElementById('nomor_urut').value,
@@ -92,20 +95,20 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify(data),
         })
-        .then(response => response.json())
-        .then(data => {
-            if(data.message === 'success') {
-                alert('Data berhasil disimpan!');
-                resetForm();
-                table.setData(); 
-            } else {
-                alert('Gagal menyimpan data: ' + data.error);
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan saat menyimpan data.');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'success') {
+                    alert('Data berhasil disimpan!');
+                    resetForm();
+                    table.setData();
+                } else {
+                    alert('Gagal menyimpan data: ' + data.error);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menyimpan data.');
+            });
     });
 
     function editData(data) {
@@ -124,16 +127,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function deleteData(id) {
-        if(confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+        if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
             fetch('/api/surat-keluar/' + id, { method: 'DELETE' })
-            .then(res => res.json())
-            .then(res => {
-                if(res.message === 'success') {
-                    table.setData();
-                } else {
-                    alert('Gagal menghapus data');
-                }
-            });
+                .then(res => res.json())
+                .then(res => {
+                    if (res.message === 'success') {
+                        table.setData();
+                    } else {
+                        alert('Gagal menghapus data');
+                    }
+                });
         }
     }
 
@@ -149,14 +152,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btn-cancel-edit').addEventListener('click', resetForm);
 
     // Export actions
-    document.getElementById("download-pdf").addEventListener("click", function(){
+    document.getElementById("download-pdf").addEventListener("click", function () {
         table.download("pdf", "data-surat-keluar.pdf", {
-            orientation:"landscape", //set page orientation to landscape since there are many columns
-            title:"Data Surat Keluar", //add title to report
+            orientation: "landscape", //set page orientation to landscape since there are many columns
+            title: "Data Surat Keluar", //add title to report
         });
     });
 
-    document.getElementById("download-xlsx").addEventListener("click", function(){
-        table.download("xlsx", "data-surat-keluar.xlsx", {sheetName:"Surat Keluar"});
+    document.getElementById("download-xlsx").addEventListener("click", function () {
+        table.download("xlsx", "data-surat-keluar.xlsx", { sheetName: "Surat Keluar" });
     });
 });

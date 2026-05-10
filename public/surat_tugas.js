@@ -220,10 +220,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Action formatter for table
     var actionFormatter = function (cell) {
         return '<div class="d-flex gap-1 justify-content-center">'
-            + '<button class="btn btn-sm btn-primary btn-edit" title="Edit"><i class="bi bi-pencil"></i></button>'
-            + '<button class="btn btn-sm btn-warning btn-generate" title="Generate Docx"><i class="bi bi-file-word"></i></button>'
+            + '<button class="btn btn-sm btn-primary btn-warning" title="Edit"><i class="bi bi-pencil"></i> Edit</button>'
+            + '<button class="btn btn-sm btn-success btn-generate" title="Generate Dokumen"><i class="bi bi-printer-fill"></i> Cetak</button>'
             //+ '<button class="btn btn-sm btn-info btn-debug" title="Debug"><i class="bi bi-bug"></i></button>'
-            + '<button class="btn btn-sm btn-danger btn-delete" title="Hapus"><i class="bi bi-trash"></i></button>'
+            + '<button class="btn btn-sm btn-danger btn-delete" title="Hapus"><i class="bi bi-trash"></i> Hapus</button>'
             + '</div>';
     };
 
@@ -234,9 +234,9 @@ document.addEventListener('DOMContentLoaded', function () {
         paginationSize: 10,
         placeholder: "Tidak ada data",
         columns: [
-            { title: "No", formatter: "rownum", hozAlign: "center", width: 60, headerSort: false },
-            { title: "Aksi", formatter: actionFormatter, hozAlign: "center", width: 280, headerSort: false },
+            //{ title: "No", formatter: "rownum", hozAlign: "center", width: 60, headerSort: false },
             { title: "Nomor Surat", field: "surat_nomor", sorter: "string", minWidth: 120 },
+            { title: "Aksi", formatter: actionFormatter, hozAlign: "center", width: 280, headerSort: false },
             { title: "Nama Kegiatan", field: "kegiatan_nama", sorter: "string", minWidth: 200 },
             { title: "Tgl Kegiatan", field: "kegiatan_haritanggal", sorter: "string", minWidth: 120 },
             { title: "Jml Pegawai", field: "pegawai_jumlah", hozAlign: "center", minWidth: 100 }
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
             }
         } else if (action.classList.contains('btn-generate')) {
-            window.open('/api/surat-tugas/generate/' + rowData.id, '_blank');
+            window.open('/surat_tugas_generate.html?id=' + rowData.id, '_blank');
         } else if (action.classList.contains('btn-debug')) {
             fetch('/api/surat-tugas/' + rowData.id)
                 .then(function (res) { return res.json(); })
