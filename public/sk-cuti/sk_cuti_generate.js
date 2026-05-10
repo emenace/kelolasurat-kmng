@@ -125,11 +125,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td>:</td>
             <td>Memberikan cuti tahunan pegawai negeri sipil yang berada dalam lingkungan Kantor Kementerian Agama Kota Metro :
                 <table class="kesatu-detail" style="margin-top: 3px;">
-                    <tr><td>nama</td><td>:</td><td>${d.pegawai_nama || '...'}</td></tr>
+                    <tr><td>Nama</td><td>:</td><td>${d.pegawai_nama || '...'}</td></tr>
                     <tr><td>NIP</td><td>:</td><td>${d.pegawai_nip || '...'}</td></tr>
-                    <tr><td>pangkat/golongan</td><td>:</td><td>${d.pegawai_pangkat || '...'} / "${d.pegawai_golongan || '...'}</td></tr>
-                    <tr><td>lama Cuti</td><td>:</td><td>${d.cuti_daylong || '...'} hari</td></tr>
-                    <tr><td>tanggal</td><td>:</td><td>${formatDateID(d.cuti_startdate)} s.d ${formatDateID(d.cuti_enddate)}</td></tr>
+                    <tr><td>Pangkat/Golongan</td><td>:</td><td>${d.pegawai_pangkat || '...'} / "${d.pegawai_golongan || '...'}</td></tr>
+                    <tr><td>Lama Cuti</td><td>:</td><td>${d.cuti_daylong || '...'} hari</td></tr>
+                    <tr><td>Tanggal</td><td>:</td><td>${formatDateID(d.cuti_startdate)} s.d ${formatDateID(d.cuti_enddate)}</td></tr>
                 </table>
             </td>
         </tr>
