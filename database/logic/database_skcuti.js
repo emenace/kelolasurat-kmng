@@ -1,13 +1,19 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const fs = require('fs');
 
 const dbPath = path.resolve(__dirname, '../data/skcuti.sqlite');
 
+const dataDir = path.dirname(dbPath);
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+}
+
 const dbSKCuti = new sqlite3.Database(dbPath, (err) => {
     if (err) {
-        console.error('Error opening skcuti database', err.message);
+        console.error('Error opening skcuti.sqlite:', err.message);
     } else {
-        console.log('Connected to the skcuti SQLite database.');
+        console.log('Connected to the skcuti.sqlite.');
 
         dbSKCuti.run(`CREATE TABLE IF NOT EXISTS sk_cuti (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
