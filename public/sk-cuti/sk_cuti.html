@@ -112,6 +112,8 @@
                             <input type="hidden" id="pegawai_pangkat">
                             <input type="hidden" id="pegawai_golongan">
                             <input type="hidden" id="pegawai_jabatan">
+                            <input type="hidden" id="pegawai_m_t">
+                            <input type="hidden" id="pegawai_m_b">
 
                             <!-- Section 3 -->
                             <h6 class="fw-bold text-success border-bottom pb-2 mb-3 mt-4">3. Data Cuti</h6>
@@ -133,6 +135,23 @@
                                 <label class="form-label">Lama Cuti (hari)</label>
                                 <input type="number" class="form-control" id="cuti_daylong" required>
                             </div>
+                            <div class="mb-3">
+                                <label class="form-label">Alamat Selama Cuti <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cuti_alamatcuti" placeholder="Masukkan alamat selama cuti" required>
+                                <div class="invalid-feedback">Form value required</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nomor HP <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="cuti_nohp" placeholder="08xxxxxxxxxx" required>
+                                    <div class="invalid-feedback">Form value required</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Unit Kerja <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="pegawai_unitkerja" placeholder="Masukkan unit kerja" required>
+                                    <div class="invalid-feedback">Form value required</div>
+                                </div>
+                            </div>
                             <div class="mb-3 position-relative">
                                 <label class="form-label">Atasan Langsung</label>
                                 <input type="text" class="form-control" id="search_atasan" placeholder="Ketik nama atasan..." autocomplete="off">
@@ -146,6 +165,11 @@
                             </div>
                             <input type="hidden" id="atasan_nama">
                             <input type="hidden" id="atasan_nip">
+                            <div class="mb-3">
+                                <label class="form-label">Jabatan Atasan Langsung <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cuti_atasan_jabatan" placeholder="Kepala" required>
+                                <div class="invalid-feedback">Form value required</div>
+                            </div>
 
                             <div class="d-grid gap-2 mt-4">
                                 <button type="submit" class="btn btn-kemenag btn-lg" id="btn-submit">

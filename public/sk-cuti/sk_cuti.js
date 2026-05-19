@@ -11,12 +11,18 @@ document.addEventListener('DOMContentLoaded', function () {
     var cutiStartdate = document.getElementById('cuti_startdate');
     var cutiEnddate = document.getElementById('cuti_enddate');
     var cutiDaylong = document.getElementById('cuti_daylong');
+    var cutiAlamatcuti = document.getElementById('cuti_alamatcuti');
+    var cutiNohp = document.getElementById('cuti_nohp');
+    var pegawaiUnitkerja = document.getElementById('pegawai_unitkerja');
+    var cutiAtasanJabatan = document.getElementById('cuti_atasan_jabatan');
 
     var pegawaiNama = document.getElementById('pegawai_nama');
     var pegawaiNip = document.getElementById('pegawai_nip');
     var pegawaiPangkat = document.getElementById('pegawai_pangkat');
     var pegawaiGolongan = document.getElementById('pegawai_golongan');
     var pegawaiJabatan = document.getElementById('pegawai_jabatan');
+    var pegawaiMT = document.getElementById('pegawai_m_t');
+    var pegawaiMB = document.getElementById('pegawai_m_b');
 
     var atasanNama = document.getElementById('atasan_nama');
     var atasanNip = document.getElementById('atasan_nip');
@@ -25,6 +31,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Set default date to today
     cutiCreatedate.valueAsDate = new Date();
+
+    // Enable Bootstrap validation styling
+    form.classList.add('needs-validation');
+    form.setAttribute('novalidate', '');
 
     // Fetch Pegawai Data for Autocomplete
     fetch('/api/pegawai')
@@ -80,6 +90,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     pegawaiPangkat.value = p.Pangkat || '';
                     pegawaiGolongan.value = p["PANGKAT GOL/RUANG"] || '';
                     pegawaiJabatan.value = p.JABATAN || '';
+                    pegawaiMT.value = p["MASA KERJA THN"] || '';
+                    pegawaiMB.value = p["BLN"] || '';
 
                     document.getElementById('display_nama').textContent = p.NAMA || '-';
                     document.getElementById('display_nip').textContent = p["NIP BARU"] || '-';
@@ -156,6 +168,13 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('submit', function (e) {
         e.preventDefault();
 
+        // Bootstrap validation
+        if (!form.checkValidity()) {
+            e.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+
         var tahun = '';
         if (cutiCreatedate.value) {
             tahun = cutiCreatedate.value.split('-')[0] || '';
@@ -175,7 +194,13 @@ document.addEventListener('DOMContentLoaded', function () {
             pegawai_golongan: pegawaiGolongan.value,
             pegawai_jabatan: pegawaiJabatan.value,
             atasan_nama: atasanNama.value,
-            atasan_nip: atasanNip.value
+            atasan_nip: atasanNip.value,
+            cuti_alamatcuti: cutiAlamatcuti.value,
+            cuti_nohp: cutiNohp.value,
+            pegawai_unitkerja: pegawaiUnitkerja.value,
+            cuti_atasan_jabatan: cutiAtasanJabatan.value,
+            pegawai_m_t: pegawaiMT.value,
+            pegawai_m_b: pegawaiMB.value
         };
 
         var method = idCuti.value ? 'PUT' : 'POST';
@@ -200,14 +225,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function resetForm() {
         form.reset();
+        form.classList.remove('was-validated');
         idCuti.value = "";
         pegawaiNama.value = "";
         pegawaiNip.value = "";
         pegawaiPangkat.value = "";
         pegawaiGolongan.value = "";
         pegawaiJabatan.value = "";
+        pegawaiMT.value = "";
+        pegawaiMB.value = "";
         atasanNama.value = "";
         atasanNip.value = "";
+        cutiAlamatcuti.value = "";
+        cutiNohp.value = "";
+        pegawaiUnitkerja.value = "";
+        cutiAtasanJabatan.value = "";
         pegawaiInfoBox.classList.add('d-none');
         atasanInfoBox.classList.add('d-none');
         btnCancelEdit.classList.add('d-none');
@@ -222,6 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return '<div class="d-flex gap-1 justify-content-center">'
             + '<button class="btn btn-sm btn-warning btn-edit" title="Edit"><i class="bi bi-pencil"></i> Edit</button>'
             + '<button class="btn btn-sm btn-success btn-generate" title="Generate Dokumen"><i class="bi bi-printer-fill"></i> Cetak</button>'
+            + '<button class="btn btn-sm btn-info btn-formulir" title="Formulir Cuti"><i class="bi bi-file-earmark-text"></i> Formulir</button>'
             + '<button class="btn btn-sm btn-danger btn-delete" title="Hapus"><i class="bi bi-trash"></i> Hapus</button>'
             + '</div>';
     };
@@ -234,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function () {
         placeholder: "Tidak ada data",
         columns: [
             { title: "No. SK", field: "cuti_nomor", sorter: "string", minWidth: 80 },
-            { title: "Aksi", formatter: actionFormatter, hozAlign: "center", width: 280, headerSort: false },
+            { title: "Aksi", formatter: actionFormatter, hozAlign: "center", width: 380, headerSort: false },
             { title: "Nama Pegawai", field: "pegawai_nama", sorter: "string", minWidth: 180 },
             { title: "Tgl Cuti", field: "cuti_startdate", sorter: "string", minWidth: 110 },
             { title: "s.d", field: "cuti_enddate", sorter: "string", minWidth: 110 },
@@ -275,6 +308,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         pegawaiPangkat.value = d.pegawai_pangkat;
                         pegawaiGolongan.value = d.pegawai_golongan;
                         pegawaiJabatan.value = d.pegawai_jabatan;
+                        pegawaiMT.value = d.pegawai_m_t || '';
+                        pegawaiMB.value = d.pegawai_m_b || '';
 
                         document.getElementById('display_nama').textContent = d.pegawai_nama || '-';
                         document.getElementById('display_nip').textContent = d.pegawai_nip || '-';
@@ -288,6 +323,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         document.getElementById('display_atasan_nama').textContent = d.atasan_nama || '-';
                         document.getElementById('display_atasan_nip').textContent = d.atasan_nip || '-';
                         atasanInfoBox.classList.remove('d-none');
+
+                        cutiAlamatcuti.value = d.cuti_alamatcuti || '';
+                        cutiNohp.value = d.cuti_nohp || '';
+                        pegawaiUnitkerja.value = d.pegawai_unitkerja || '';
+                        cutiAtasanJabatan.value = d.cuti_atasan_jabatan || '';
 
                         btnCancelEdit.classList.remove('d-none');
                         window.scrollTo(0, 0);
@@ -303,6 +343,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } else if (action.classList.contains('btn-generate')) {
             window.open('sk_cuti_generate.html?id=' + rowData.id, '_blank');
+        } else if (action.classList.contains('btn-formulir')) {
+            window.open('sk_cuti_formulir.html?id=' + rowData.id, '_blank');
         }
     });
 

@@ -30,8 +30,27 @@ const dbSKCuti = new sqlite3.Database(dbPath, (err) => {
             pegawai_golongan TEXT,
             pegawai_jabatan TEXT,
             atasan_nama TEXT,
-            atasan_nip TEXT
+            atasan_nip TEXT,
+            cuti_alamatcuti TEXT,
+            cuti_nohp TEXT,
+            pegawai_unitkerja TEXT,
+            cuti_atasan_jabatan TEXT,
+            pegawai_m_t TEXT,
+            pegawai_m_b TEXT
         )`);
+
+        // Add new columns to existing databases (safe to call multiple times)
+        const newColumns = [
+            'cuti_alamatcuti TEXT',
+            'cuti_nohp TEXT',
+            'pegawai_unitkerja TEXT',
+            'cuti_atasan_jabatan TEXT',
+            'pegawai_m_t TEXT',
+            'pegawai_m_b TEXT'
+        ];
+        newColumns.forEach(col => {
+            dbSKCuti.run(`ALTER TABLE sk_cuti ADD COLUMN ${col}`, () => {});
+        });
     }
 });
 
