@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td style="text-align:left;">TIDAK DISETUJUI****</td>
         </tr>
         <tr>
-            <td style="height:30px;">&nbsp;V</td>
+            <td style="height:30px;">&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td style="text-align:left;">TIDAK DISETUJUI****</td>
         </tr>
         <tr>
-            <td style="height:30px;">&nbsp;V</td>
+            <td style="height:30px;">&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
