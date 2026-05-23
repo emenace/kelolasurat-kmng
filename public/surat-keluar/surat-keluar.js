@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
             }
-            document.getElementById('nomor_urut').placeholder = maxNo + 1;
+            document.getElementById('nomor_urut').value = maxNo + 1;
             return response.data;
         },
         pagination: "local",
