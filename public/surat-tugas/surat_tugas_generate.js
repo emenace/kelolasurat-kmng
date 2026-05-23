@@ -10,6 +10,20 @@ function formatDateID(dateStr) {
     return day + ' ' + (months[monthIdx] || '') + ' ' + year;
 }
 
+function formatDateIDWithDay(dateStr) {
+    if (!dateStr) return '...';
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+    const dayName = days[dateObj.getDay()];
+    const day = parseInt(parts[2], 10);
+    const monthIdx = parseInt(parts[1], 10) - 1;
+    const year = parts[0];
+    return dayName + ', ' + day + ' ' + (months[monthIdx] || '') + ' ' + year;
+}
+
 // Function to trigger PDF download
 window.downloadPDF = function (suratNomor) {
     const element = document.querySelector('.page');
@@ -141,7 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="detail-kegiatan">
         <p>Untuk mengikuti ${row.kegiatan_nama || '...'}, pada ;</p>
         <table style="margin-top: 10px;">
-            <tr><td>Hari, Tanggal</td><td>:</td><td>${formatDateID(row.kegiatan_haritanggal)}</td></tr>
+            <tr><td>Hari, Tanggal</td><td>:</td><td>${formatDateIDWithDay(row.kegiatan_haritanggal)}</td></tr>
             <tr><td>Waktu</td><td>:</td><td>${row.kegiatan_waktu || '...'} WIB </td></tr>
             <tr><td>Tempat</td><td>:</td><td>${row.kegiatan_tempat || '...'}</td></tr>
         </table>

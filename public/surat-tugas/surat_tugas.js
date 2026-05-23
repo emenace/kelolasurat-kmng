@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Action formatter for table
     var actionFormatter = function (cell) {
         return '<div class="d-flex gap-1 justify-content-center">'
-            + '<button class="btn btn-sm btn-primary btn-warning" title="Edit"><i class="bi bi-pencil"></i> Edit</button>'
+            + '<button class="btn btn-sm btn-warning btn-edit" title="Edit"><i class="bi bi-pencil"></i> Edit</button>'
             + '<button class="btn btn-sm btn-success btn-generate" title="Generate Dokumen"><i class="bi bi-printer-fill"></i> Cetak</button>'
             //+ '<button class="btn btn-sm btn-info btn-debug" title="Debug"><i class="bi bi-bug"></i></button>'
             + '<button class="btn btn-sm btn-danger btn-delete" title="Hapus"><i class="bi bi-trash"></i> Hapus</button>'
