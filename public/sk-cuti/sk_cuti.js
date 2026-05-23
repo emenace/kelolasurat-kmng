@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         });
                     }
-                    cutiNomor.placeholder = maxNo + 1;
+                    cutiNomor.value = maxNo + 1;
                 }
             });
     }

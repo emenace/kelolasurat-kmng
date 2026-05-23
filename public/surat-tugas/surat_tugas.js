@@ -46,7 +46,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         });
                     }
-                    suratNomor.placeholder = maxNo + 1;
+                    suratNomor.value = maxNo + 1;
+                    suratTanggal.value = new Date().toISOString().split('T')[0];
                 }
             });
     }
