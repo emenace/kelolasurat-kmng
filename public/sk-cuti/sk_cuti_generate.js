@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <tr><td>NIP</td><td>:</td><td>${d.pegawai_nip || '...'}</td></tr>
                     <tr><td>Pangkat/Golongan</td><td>:</td><td>${d.pegawai_pangkat || '...'} (${d.pegawai_golongan || '...'})</td></tr>
                     <tr><td>Lama Cuti</td><td>:</td><td>${d.cuti_daylong || '...'} hari</td></tr>
-                    <tr><td>Tanggal</td><td>:</td><td>${formatDateID(d.cuti_startdate)} s.d ${formatDateID(d.cuti_enddate)}</td></tr>
+                    <tr><td>Tanggal</td><td>:</td><td>${d.cuti_tanggalmanual ? d.cuti_tanggalmanual : (formatDateID(d.cuti_startdate) + ' s.d ' + formatDateID(d.cuti_enddate))}</td></tr>
                 </table>
             </td>
         </tr>

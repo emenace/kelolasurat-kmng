@@ -46,7 +46,8 @@ const dbSKCuti = new sqlite3.Database(dbPath, (err) => {
             'pegawai_unitkerja TEXT',
             'cuti_atasan_jabatan TEXT',
             'pegawai_m_t TEXT',
-            'pegawai_m_b TEXT'
+            'pegawai_m_b TEXT',
+            'cuti_tanggalmanual TEXT'
         ];
         newColumns.forEach(col => {
             dbSKCuti.run(`ALTER TABLE sk_cuti ADD COLUMN ${col}`, () => {});

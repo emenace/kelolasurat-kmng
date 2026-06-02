@@ -273,8 +273,8 @@ app.get('/api/sk-cuti/:id', (req, res) => {
 app.post('/api/sk-cuti', (req, res) => {
     const d = req.body;
     dbSKCuti.run(
-        `INSERT INTO sk_cuti (cuti_nomor, cuti_createdate, cuti_tahun, cuti_alasan, cuti_startdate, cuti_enddate, cuti_daylong, pegawai_nama, pegawai_nip, pegawai_pangkat, pegawai_golongan, pegawai_jabatan, atasan_nama, atasan_nip, cuti_alamatcuti, cuti_nohp, pegawai_unitkerja, cuti_atasan_jabatan, pegawai_m_t, pegawai_m_b) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-        [d.cuti_nomor, d.cuti_createdate, d.cuti_tahun, d.cuti_alasan, d.cuti_startdate, d.cuti_enddate, d.cuti_daylong, d.pegawai_nama, d.pegawai_nip, d.pegawai_pangkat, d.pegawai_golongan, d.pegawai_jabatan, d.atasan_nama, d.atasan_nip, d.cuti_alamatcuti, d.cuti_nohp, d.pegawai_unitkerja, d.cuti_atasan_jabatan, d.pegawai_m_t, d.pegawai_m_b],
+        `INSERT INTO sk_cuti (cuti_nomor, cuti_createdate, cuti_tahun, cuti_alasan, cuti_startdate, cuti_enddate, cuti_daylong, pegawai_nama, pegawai_nip, pegawai_pangkat, pegawai_golongan, pegawai_jabatan, atasan_nama, atasan_nip, cuti_alamatcuti, cuti_nohp, pegawai_unitkerja, cuti_atasan_jabatan, pegawai_m_t, pegawai_m_b, cuti_tanggalmanual) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [d.cuti_nomor, d.cuti_createdate, d.cuti_tahun, d.cuti_alasan, d.cuti_startdate, d.cuti_enddate, d.cuti_daylong, d.pegawai_nama, d.pegawai_nip, d.pegawai_pangkat, d.pegawai_golongan, d.pegawai_jabatan, d.atasan_nama, d.atasan_nip, d.cuti_alamatcuti, d.cuti_nohp, d.pegawai_unitkerja, d.cuti_atasan_jabatan, d.pegawai_m_t, d.pegawai_m_b, d.cuti_tanggalmanual],
         function (err) {
             if (err) return res.status(400).json({ "error": err.message });
             res.json({ "message": "success", "data": { id: this.lastID } });
@@ -285,8 +285,8 @@ app.post('/api/sk-cuti', (req, res) => {
 app.put('/api/sk-cuti/:id', (req, res) => {
     const d = req.body;
     dbSKCuti.run(
-        `UPDATE sk_cuti SET cuti_nomor=?, cuti_createdate=?, cuti_tahun=?, cuti_alasan=?, cuti_startdate=?, cuti_enddate=?, cuti_daylong=?, pegawai_nama=?, pegawai_nip=?, pegawai_pangkat=?, pegawai_golongan=?, pegawai_jabatan=?, atasan_nama=?, atasan_nip=?, cuti_alamatcuti=?, cuti_nohp=?, pegawai_unitkerja=?, cuti_atasan_jabatan=?, pegawai_m_t=?, pegawai_m_b=? WHERE id=?`,
-        [d.cuti_nomor, d.cuti_createdate, d.cuti_tahun, d.cuti_alasan, d.cuti_startdate, d.cuti_enddate, d.cuti_daylong, d.pegawai_nama, d.pegawai_nip, d.pegawai_pangkat, d.pegawai_golongan, d.pegawai_jabatan, d.atasan_nama, d.atasan_nip, d.cuti_alamatcuti, d.cuti_nohp, d.pegawai_unitkerja, d.cuti_atasan_jabatan, d.pegawai_m_t, d.pegawai_m_b, req.params.id],
+        `UPDATE sk_cuti SET cuti_nomor=?, cuti_createdate=?, cuti_tahun=?, cuti_alasan=?, cuti_startdate=?, cuti_enddate=?, cuti_daylong=?, pegawai_nama=?, pegawai_nip=?, pegawai_pangkat=?, pegawai_golongan=?, pegawai_jabatan=?, atasan_nama=?, atasan_nip=?, cuti_alamatcuti=?, cuti_nohp=?, pegawai_unitkerja=?, cuti_atasan_jabatan=?, pegawai_m_t=?, pegawai_m_b=?, cuti_tanggalmanual=? WHERE id=?`,
+        [d.cuti_nomor, d.cuti_createdate, d.cuti_tahun, d.cuti_alasan, d.cuti_startdate, d.cuti_enddate, d.cuti_daylong, d.pegawai_nama, d.pegawai_nip, d.pegawai_pangkat, d.pegawai_golongan, d.pegawai_jabatan, d.atasan_nama, d.atasan_nip, d.cuti_alamatcuti, d.cuti_nohp, d.pegawai_unitkerja, d.cuti_atasan_jabatan, d.pegawai_m_t, d.pegawai_m_b, d.cuti_tanggalmanual, req.params.id],
         function (err) {
             if (err) return res.status(400).json({ "error": err.message });
             res.json({ "message": "success" });

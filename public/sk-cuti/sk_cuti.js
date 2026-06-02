@@ -16,6 +16,23 @@ document.addEventListener('DOMContentLoaded', function () {
     var pegawaiUnitkerja = document.getElementById('pegawai_unitkerja');
     var cutiAtasanJabatan = document.getElementById('cuti_atasan_jabatan');
 
+    var checkManualTanggal = document.getElementById('check_manual_tanggal');
+    var datePickerContainer = document.getElementById('date_picker_container');
+    var manualDateContainer = document.getElementById('manual_date_container');
+    var cutiTanggalmanual = document.getElementById('cuti_tanggalmanual');
+
+    if (checkManualTanggal) {
+        checkManualTanggal.addEventListener('change', function() {
+            if (this.checked) {
+                datePickerContainer.classList.add('d-none');
+                manualDateContainer.classList.remove('d-none');
+            } else {
+                datePickerContainer.classList.remove('d-none');
+                manualDateContainer.classList.add('d-none');
+            }
+        });
+    }
+
     var pegawaiNama = document.getElementById('pegawai_nama');
     var pegawaiNip = document.getElementById('pegawai_nip');
     var pegawaiPangkat = document.getElementById('pegawai_pangkat');
@@ -188,6 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
             cuti_startdate: cutiStartdate.value,
             cuti_enddate: cutiEnddate.value,
             cuti_daylong: parseInt(cutiDaylong.value) || 0,
+            cuti_tanggalmanual: checkManualTanggal.checked ? cutiTanggalmanual.value : '',
             pegawai_nama: pegawaiNama.value,
             pegawai_nip: pegawaiNip.value,
             pegawai_pangkat: pegawaiPangkat.value,
@@ -240,6 +258,10 @@ document.addEventListener('DOMContentLoaded', function () {
         cutiNohp.value = "";
         pegawaiUnitkerja.value = "";
         cutiAtasanJabatan.value = "";
+        checkManualTanggal.checked = false;
+        datePickerContainer.classList.remove('d-none');
+        manualDateContainer.classList.add('d-none');
+        cutiTanggalmanual.value = "";
         pegawaiInfoBox.classList.add('d-none');
         atasanInfoBox.classList.add('d-none');
         btnCancelEdit.classList.add('d-none');
@@ -299,9 +321,21 @@ document.addEventListener('DOMContentLoaded', function () {
                         cutiNomor.value = d.cuti_nomor;
                         cutiCreatedate.value = d.cuti_createdate;
                         cutiAlasan.value = d.cuti_alasan;
-                        cutiStartdate.value = d.cuti_startdate;
-                        cutiEnddate.value = d.cuti_enddate;
-                        cutiDaylong.value = d.cuti_daylong;
+                        cutiStartdate.value = d.cuti_startdate || '';
+                        cutiEnddate.value = d.cuti_enddate || '';
+                        cutiDaylong.value = d.cuti_daylong || '';
+                        
+                        if (d.cuti_tanggalmanual) {
+                            checkManualTanggal.checked = true;
+                            cutiTanggalmanual.value = d.cuti_tanggalmanual;
+                            datePickerContainer.classList.add('d-none');
+                            manualDateContainer.classList.remove('d-none');
+                        } else {
+                            checkManualTanggal.checked = false;
+                            cutiTanggalmanual.value = '';
+                            datePickerContainer.classList.remove('d-none');
+                            manualDateContainer.classList.add('d-none');
+                        }
 
                         pegawaiNama.value = d.pegawai_nama;
                         pegawaiNip.value = d.pegawai_nip;
