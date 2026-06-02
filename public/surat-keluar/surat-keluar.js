@@ -2,6 +2,22 @@ document.addEventListener('DOMContentLoaded', function () {
     // Set default date to today
     document.getElementById('tanggal_surat').valueAsDate = new Date();
 
+    // Auto-fill nomor surat based on nomor urut
+    document.getElementById('nomor_urut').addEventListener('input', function() {
+        document.getElementById('nomor_surat').value = `B-${this.value}`;
+    });
+
+    // Auto-fill Keterangan based on checkbox
+    document.getElementById('keterangan_manual').addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('keterangan').value = "Input Manual";
+        } else {
+            if (document.getElementById('keterangan').value === "Input Manual") {
+                document.getElementById('keterangan').value = "";
+            }
+        }
+    });
+
     // Custom formatter for action buttons
     var actionFormatter = function (cell, formatterParams, onRendered) {
         return `<button class="btn btn-sm btn-primary btn-edit me-1" title="Edit"><i class="bi bi-pencil"></i> Edit</button>
@@ -21,7 +37,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
             }
-            document.getElementById('nomor_urut').value = maxNo + 1;
+            const nextUrut = maxNo + 1;
+            document.getElementById('nomor_urut').value = nextUrut;
+            document.getElementById('nomor_surat').value = `B-${nextUrut}`;
             return response.data;
         },
         pagination: "local",
