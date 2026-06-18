@@ -104,16 +104,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 div.addEventListener('click', function () {
                     pegawaiNama.value = p.NAMA || '';
                     pegawaiNip.value = p["NIP BARU"] || '';
-                    pegawaiPangkat.value = p.Pangkat || '';
-                    pegawaiGolongan.value = p["PANGKAT GOL/RUANG"] || '';
+                    pegawaiPangkat.value = p.PANGKAT || '';
+                    pegawaiGolongan.value = p.GOLRU || '';
                     pegawaiJabatan.value = p.JABATAN || '';
-                    pegawaiMT.value = p["MASA KERJA THN"] || '';
-                    pegawaiMB.value = p["BLN"] || '';
+                    pegawaiMT.value = p.THN || '';
+                    pegawaiMB.value = p.BLN || '';
 
                     document.getElementById('display_nama').textContent = p.NAMA || '-';
                     document.getElementById('display_nip').textContent = p["NIP BARU"] || '-';
-                    document.getElementById('display_pangkat').textContent = p.Pangkat || '-';
-                    document.getElementById('display_golongan').textContent = p["PANGKAT GOL/RUANG"] || '-';
+                    document.getElementById('display_pangkat').textContent = p.PANGKAT || '-';
+                    document.getElementById('display_golongan').textContent = p.GOLRU || '-';
                     document.getElementById('display_jabatan').textContent = p.JABATAN || '-';
 
                     pegawaiInfoBox.classList.remove('d-none');

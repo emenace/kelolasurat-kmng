@@ -18,22 +18,23 @@ const dbPegawai = new sqlite3.Database(dbPath, (err) => {
         dbPegawai.run(`CREATE TABLE IF NOT EXISTS "DataPegawai" (
             "NO" INTEGER,
             "NAMA" TEXT,
-            "NIP LAMA" INTEGER,
-            "NIP BARU" INTEGER,
-            "TMT KERJA" TEXT,
-            "Pangkat" TEXT,
-            "PANGKAT GOL/RUANG" TEXT,
-            "T M T GOLRUANG" TEXT,
+            "NIP LAMA" TEXT,
+            "NIP BARU" TEXT,
+            "FORMATTED NIP" TEXT,
+            "GOLRU" TEXT,
+            "PANGKAT" TEXT,
+            "TMT GOLRU" TEXT,
+            "SATKER" TEXT,
             "JABATAN" TEXT,
-            "T M T JABATAN" TEXT,
-            "MASA KERJA THN" INTEGER,
+            "TMT JABATAN" TEXT,
+            "THN" INTEGER,
             "BLN" INTEGER,
             "PENDIDIKAN TERAKHIR" TEXT,
-            "THN" INTEGER,
-            "JML JAM" TEXT,
+            "THN PENDIDIKAN" INTEGER,
+            "JENIS PENDIDIKAN" TEXT,
             "TGL LAHIR" TEXT,
             "TMT PENSIUN" TEXT,
-            "KET." TEXT
+            "KET" TEXT
         )`);
     }
 });

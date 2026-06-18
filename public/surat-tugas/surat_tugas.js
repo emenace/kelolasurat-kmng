@@ -114,8 +114,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     div.addEventListener('click', function () {
                         iNama.value = p.NAMA || '';
                         iNip.value = p["NIP BARU"] || '';
-                        iPangkat.value = p.Pangkat || '';
-                        iGolongan.value = p["PANGKAT GOL/RUANG"] || '';
+                        iPangkat.value = p.PANGKAT || '';
+                        iGolongan.value = p.GOLRU || '';
                         iJabatan.value = p.JABATAN || '';
                         searchInput.value = '';
                         autoContainer.classList.add('d-none');

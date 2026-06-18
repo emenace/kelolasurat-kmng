@@ -135,7 +135,7 @@ app.delete('/api/legalisir/:id', (req, res) => {
 
 // Get all pegawai
 app.get('/api/pegawai', (req, res) => {
-    dbPegawai.all('SELECT "NO", "NAMA", "NIP BARU", "TMT KERJA", "Pangkat", "PANGKAT GOL/RUANG", "JABATAN", "TGL LAHIR", "TMT PENSIUN", "MASA KERJA THN", "BLN" FROM DataPegawai ORDER BY "NO" ASC', [], (err, rows) => {
+    dbPegawai.all('SELECT * FROM DataPegawai ORDER BY "NO" ASC', [], (err, rows) => {
         if (err) {
             res.status(400).json({ "error": err.message });
             return;

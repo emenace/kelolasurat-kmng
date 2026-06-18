@@ -20,9 +20,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 { title: "Nama", field: "NAMA", sorter: "string", minWidth: 150 },
                 { title: "NIP", field: "NIP BARU", sorter: "string", minWidth: 150 },
-                { title: "TMT Kerja", field: "TMT KERJA", sorter: "string", minWidth: 100 },
-                { title: "Pangkat", field: "Pangkat", sorter: "string", minWidth: 120 },
-                { title: "Pangkat Gol/Ruang", field: "PANGKAT GOL/RUANG", sorter: "string", minWidth: 100 },
+                { title: "Satuan Kerja", field: "SATKER", sorter: "string", minWidth: 150 },
+                { title: "Pangkat", field: "PANGKAT", sorter: "string", minWidth: 120 },
+                { title: "Pangkat Gol/Ruang", field: "GOLRU", sorter: "string", minWidth: 100 },
                 { title: "Jabatan", field: "JABATAN", sorter: "string", minWidth: 150 },
                 { title: "Tanggal Lahir", field: "TGL LAHIR", sorter: "string", minWidth: 120 },
                 { title: "TMT Pensiun", field: "TMT PENSIUN", sorter: "string", minWidth: 120 }
