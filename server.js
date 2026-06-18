@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -147,7 +148,54 @@ app.get('/api/pegawai', (req, res) => {
     });
 });
 
-// --- API for Surat Tugas ---
+// Verify pass key for editing data pegawai
+app.post('/api/verify-key', (req, res) => {
+    const { key } = req.body;
+    const correctKey = process.env.EDIT_PASSKEY;
+    if (key === correctKey) {
+        res.json({ message: "success" });
+    } else {
+        res.status(401).json({ error: "Kode kunci tidak sesuai, perubahan tidak diperbolehkan" });
+    }
+});
+
+// Add new pegawai
+app.post('/api/pegawai', (req, res) => {
+    const d = req.body;
+    dbPegawai.run(
+        `INSERT INTO DataPegawai ("NO","NAMA","NIP LAMA","NIP BARU","FORMATTED NIP","GOLRU","PANGKAT","TMT GOLRU","SATKER","JABATAN","TMT JABATAN","THN","BLN","PENDIDIKAN TERAKHIR","THN PENDIDIKAN","JENIS PENDIDIKAN","TGL LAHIR","TMT PENSIUN","KET")
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [d["NO"], d["NAMA"], d["NIP LAMA"], d["NIP BARU"], d["FORMATTED NIP"], d["GOLRU"], d["PANGKAT"], d["TMT GOLRU"], d["SATKER"], d["JABATAN"], d["TMT JABATAN"], d["THN"], d["BLN"], d["PENDIDIKAN TERAKHIR"], d["THN PENDIDIKAN"], d["JENIS PENDIDIKAN"], d["TGL LAHIR"], d["TMT PENSIUN"], d["KET"]],
+        function (err) {
+            if (err) return res.status(400).json({ "error": err.message });
+            res.json({ "message": "success", "data": { id: this.lastID } });
+        }
+    );
+});
+
+// Update pegawai by NO
+app.put('/api/pegawai/:no', (req, res) => {
+    const d = req.body;
+    const no = req.params.no;
+    dbPegawai.run(
+        `UPDATE DataPegawai SET "NAMA"=?,"NIP LAMA"=?,"NIP BARU"=?,"FORMATTED NIP"=?,"GOLRU"=?,"PANGKAT"=?,"TMT GOLRU"=?,"SATKER"=?,"JABATAN"=?,"TMT JABATAN"=?,"THN"=?,"BLN"=?,"PENDIDIKAN TERAKHIR"=?,"THN PENDIDIKAN"=?,"JENIS PENDIDIKAN"=?,"TGL LAHIR"=?,"TMT PENSIUN"=?,"KET"=? WHERE "NO"=?`,
+        [d["NAMA"], d["NIP LAMA"], d["NIP BARU"], d["FORMATTED NIP"], d["GOLRU"], d["PANGKAT"], d["TMT GOLRU"], d["SATKER"], d["JABATAN"], d["TMT JABATAN"], d["THN"], d["BLN"], d["PENDIDIKAN TERAKHIR"], d["THN PENDIDIKAN"], d["JENIS PENDIDIKAN"], d["TGL LAHIR"], d["TMT PENSIUN"], d["KET"], no],
+        function (err) {
+            if (err) return res.status(400).json({ "error": err.message });
+            res.json({ "message": "success" });
+        }
+    );
+});
+
+// Delete pegawai by NO
+app.delete('/api/pegawai/:no', (req, res) => {
+    dbPegawai.run('DELETE FROM DataPegawai WHERE "NO"=?', [req.params.no], function (err) {
+        if (err) return res.status(400).json({ "error": err.message });
+        res.json({ "message": "success" });
+    });
+});
+
+
 
 app.get('/api/surat-tugas/last-nomor', (req, res) => {
     db.get('SELECT nomor_urut FROM surat_keluar ORDER BY CAST(nomor_urut AS INTEGER) DESC LIMIT 1', [], (err, row) => {

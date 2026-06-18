@@ -1,76 +1,300 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     let table;
+    let isEditMode = false;
 
-    // Inisialisasi Tabulator
+    // All columns definition with their labels
+    const FIELDS = [
+        { field: "NO",                label: "No"                },
+        { field: "NAMA",              label: "Nama"              },
+        { field: "NIP LAMA",          label: "NIP Lama"          },
+        { field: "NIP BARU",          label: "NIP Baru"          },
+        { field: "FORMATTED NIP",     label: "Formatted NIP"     },
+        { field: "GOLRU",             label: "Gol/Ruang"         },
+        { field: "PANGKAT",           label: "Pangkat"           },
+        { field: "TMT GOLRU",         label: "TMT Gol/Ruang"     },
+        { field: "SATKER",            label: "Satuan Kerja"      },
+        { field: "JABATAN",           label: "Jabatan"           },
+        { field: "TMT JABATAN",       label: "TMT Jabatan"       },
+        { field: "THN",               label: "Masa Kerja Thn"    },
+        { field: "BLN",               label: "Masa Kerja Bln"    },
+        { field: "PENDIDIKAN TERAKHIR", label: "Pendidikan"      },
+        { field: "THN PENDIDIKAN",    label: "Thn Pendidikan"    },
+        { field: "JENIS PENDIDIKAN",  label: "Jenis Pendidikan"  },
+        { field: "TGL LAHIR",         label: "Tgl Lahir"         },
+        { field: "TMT PENSIUN",       label: "TMT Pensiun"       },
+        { field: "KET",               label: "Keterangan"        }
+    ];
+
+    // Columns shown in VIEW mode
+    const VIEW_FIELDS = ["NAMA", "NIP BARU", "SATKER", "PANGKAT", "GOLRU", "JABATAN", "TGL LAHIR", "TMT PENSIUN"];
+
+    // ----- Build columns for VIEW mode -----
+    function buildViewColumns() {
+        const cols = [
+            { title: "No", formatter: "rownum", hozAlign: "center", width: 55, headerSort: false }
+        ];
+        VIEW_FIELDS.forEach(f => {
+            const def = FIELDS.find(x => x.field === f);
+            cols.push({ title: def.label, field: f, sorter: "string", minWidth: 140 });
+        });
+        return cols;
+    }
+
+    // ----- Build columns for EDIT mode -----
+    function buildEditColumns() {
+        const actionCol = {
+            title: "EDIT",
+            headerSort: false,
+            hozAlign: "center",
+            width: 130,
+            frozen: true,
+            formatter: function (cell) {
+                return '<div class="d-flex gap-1 justify-content-center">' +
+                    '<button class="btn btn-xs btn-warning btn-edit-row" style="font-size:11px;padding:2px 7px;">Edit</button>' +
+                    '<button class="btn btn-xs btn-danger btn-delete-row" style="font-size:11px;padding:2px 7px;">Hapus</button>' +
+                    '</div>';
+            },
+            cellClick: function (e, cell) {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                if (btn.classList.contains('btn-edit-row')) {
+                    openEditRowModal(cell.getRow().getData());
+                } else if (btn.classList.contains('btn-delete-row')) {
+                    deleteRow(cell.getRow().getData());
+                }
+            }
+        };
+
+        const cols = [
+            actionCol,
+            { title: "No", formatter: "rownum", hozAlign: "center", width: 55, headerSort: false }
+        ];
+
+        FIELDS.forEach(def => {
+            cols.push({ title: def.label, field: def.field, sorter: "string", minWidth: 120 });
+        });
+
+        return cols;
+    }
+
+    // ----- Initialize Tabulator -----
     function initTable(data) {
+        if (table) {
+            table.destroy();
+            table = null;
+        }
         table = new Tabulator("#table-pegawai", {
             data: data,
-            layout: "fitData", // Enable horizontal scrolling when columns are too wide
+            layout: "fitData",
             pagination: "local",
             paginationSize: 10,
             paginationSizeSelector: [10, 25, 50, 100, true],
             placeholder: "Tidak ada data",
-            columns: [
-                {
-                    title: "No", 
-                    formatter: "rownum", 
-                    hozAlign: "center", 
-                    width: 60,
-                    headerSort: false
-                },
-                { title: "Nama", field: "NAMA", sorter: "string", minWidth: 150 },
-                { title: "NIP", field: "NIP BARU", sorter: "string", minWidth: 150 },
-                { title: "Satuan Kerja", field: "SATKER", sorter: "string", minWidth: 150 },
-                { title: "Pangkat", field: "PANGKAT", sorter: "string", minWidth: 120 },
-                { title: "Pangkat Gol/Ruang", field: "GOLRU", sorter: "string", minWidth: 100 },
-                { title: "Jabatan", field: "JABATAN", sorter: "string", minWidth: 150 },
-                { title: "Tanggal Lahir", field: "TGL LAHIR", sorter: "string", minWidth: 120 },
-                { title: "TMT Pensiun", field: "TMT PENSIUN", sorter: "string", minWidth: 120 }
-            ],
+            columns: buildViewColumns(),
             locale: "id",
             langs: {
                 "id": {
                     "pagination": {
-                        "first": "Pertama",
-                        "first_title": "Halaman Pertama",
-                        "last": "Terakhir",
-                        "last_title": "Halaman Terakhir",
-                        "prev": "Sebelumnya",
-                        "prev_title": "Halaman Sebelumnya",
-                        "next": "Selanjutnya",
-                        "next_title": "Halaman Selanjutnya",
-                        "all": "Semua",
+                        "first": "Pertama", "first_title": "Halaman Pertama",
+                        "last": "Terakhir", "last_title": "Halaman Terakhir",
+                        "prev": "Sebelumnya", "prev_title": "Halaman Sebelumnya",
+                        "next": "Selanjutnya", "next_title": "Halaman Selanjutnya",
+                        "all": "Semua"
                     }
                 }
             }
         });
     }
 
-    // Load data from API
-    function loadData() {
+    // ----- Load data from API -----
+    function loadData(callback) {
         fetch('/api/pegawai')
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
-                if(data.message === "success") {
-                    initTable(data.data);
+                if (data.message === "success") {
+                    if (callback) callback(data.data);
+                    else initTable(data.data);
                 } else {
                     console.error("Gagal mengambil data:", data.error);
                 }
             })
-            .catch(error => {
-                console.error("Error loading data:", error);
+            .catch(err => console.error("Error loading data:", err));
+    }
+
+    // ----- Switch modes -----
+    function enterEditMode() {
+        isEditMode = true;
+        document.getElementById('btn-update-data').textContent = 'Selesai Edit';
+        document.getElementById('btn-update-data').classList.replace('btn-warning', 'btn-secondary');
+        document.getElementById('btn-tambah-data').classList.remove('d-none');
+
+        loadData(function (data) {
+            if (table) { table.destroy(); table = null; }
+            table = new Tabulator("#table-pegawai", {
+                data: data,
+                layout: "fitData",
+                pagination: "local",
+                paginationSize: 10,
+                paginationSizeSelector: [10, 25, 50, 100, true],
+                placeholder: "Tidak ada data",
+                columns: buildEditColumns(),
+                locale: "id",
+                langs: {
+                    "id": {
+                        "pagination": {
+                            "first": "Pertama", "last": "Terakhir",
+                            "prev": "Sebelumnya", "next": "Selanjutnya", "all": "Semua"
+                        }
+                    }
+                }
+            });
+        });
+    }
+
+    function exitEditMode() {
+        isEditMode = false;
+        document.getElementById('btn-update-data').textContent = 'Update Data';
+        document.getElementById('btn-update-data').classList.replace('btn-secondary', 'btn-warning');
+        document.getElementById('btn-tambah-data').classList.add('d-none');
+        loadData(function (data) { initTable(data); });
+    }
+
+    // ----- Update Data button -----
+    let verifyModalInstance = null;
+    document.getElementById('btn-update-data').addEventListener('click', function () {
+        if (!isEditMode) {
+            document.getElementById('input-pass-key').value = '';
+            document.getElementById('verify-key-error').classList.add('d-none');
+            if(!verifyModalInstance) verifyModalInstance = new bootstrap.Modal(document.getElementById('verifyKeyModal'));
+            verifyModalInstance.show();
+        } else {
+            exitEditMode();
+        }
+    });
+
+    document.getElementById('btn-submit-key').addEventListener('click', function() {
+        const key = document.getElementById('input-pass-key').value;
+        const errorEl = document.getElementById('verify-key-error');
+        
+        fetch('/api/verify-key', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if(res.message === 'success') {
+                errorEl.classList.add('d-none');
+                verifyModalInstance.hide();
+                enterEditMode();
+            } else {
+                errorEl.classList.remove('d-none');
+                errorEl.textContent = res.error || "Kode kunci tidak sesuai, perubahan tidak diperbolehkan";
+            }
+        })
+        .catch(err => {
+            errorEl.classList.remove('d-none');
+            errorEl.textContent = "Terjadi kesalahan sistem";
+        });
+    });
+
+    // ----- Tambah Data button -----
+    document.getElementById('btn-tambah-data').addEventListener('click', function () {
+        openAddRowModal();
+    });
+
+    // ----- Delete Row -----
+    function deleteRow(rowData) {
+        if (!confirm('Yakin ingin menghapus data: ' + rowData['NAMA'] + '?')) return;
+        fetch('/api/pegawai/' + encodeURIComponent(rowData['NO']), { method: 'DELETE' })
+            .then(r => r.json())
+            .then(res => {
+                if (res.message === 'success') {
+                    loadData(function (data) {
+                        table.setData(data);
+                    });
+                } else {
+                    alert('Gagal menghapus: ' + res.error);
+                }
             });
     }
 
-    // Global Search
-    const searchInput = document.getElementById("global-search");
-    searchInput.addEventListener("input", function () {
-        const term = searchInput.value;
-        if(table) {
+    // ----- Edit Row Modal -----
+    function openEditRowModal(rowData) {
+        document.getElementById('edit-modal-title').textContent = 'Edit Data: ' + (rowData['NAMA'] || '');
+        document.getElementById('edit-modal-no').value = rowData['NO'] || '';
+
+        FIELDS.forEach(def => {
+            const el = document.getElementById('edit-field-' + def.field.replace(/\s+/g, '_'));
+            if (el) el.value = rowData[def.field] || '';
+        });
+
+        const modal = new bootstrap.Modal(document.getElementById('editRowModal'));
+        modal.show();
+    }
+
+    document.getElementById('btn-save-edit').addEventListener('click', function () {
+        const no = document.getElementById('edit-modal-no').value;
+        const payload = {};
+        FIELDS.forEach(def => {
+            const el = document.getElementById('edit-field-' + def.field.replace(/\s+/g, '_'));
+            if (el) payload[def.field] = el.value;
+        });
+
+        fetch('/api/pegawai/' + encodeURIComponent(no), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(r => r.json())
+            .then(res => {
+                if (res.message === 'success') {
+                    bootstrap.Modal.getInstance(document.getElementById('editRowModal')).hide();
+                    loadData(function (data) { table.setData(data); });
+                } else {
+                    alert('Gagal menyimpan: ' + res.error);
+                }
+            });
+    });
+
+    // ----- Add Row Modal -----
+    function openAddRowModal() {
+        document.getElementById('add-form').reset();
+        const modal = new bootstrap.Modal(document.getElementById('addRowModal'));
+        modal.show();
+    }
+
+    document.getElementById('btn-save-add').addEventListener('click', function () {
+        const payload = {};
+        FIELDS.forEach(def => {
+            const el = document.getElementById('add-field-' + def.field.replace(/\s+/g, '_'));
+            if (el) payload[def.field] = el.value;
+        });
+
+        fetch('/api/pegawai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(r => r.json())
+            .then(res => {
+                if (res.message === 'success') {
+                    bootstrap.Modal.getInstance(document.getElementById('addRowModal')).hide();
+                    loadData(function (data) { table.setData(data); });
+                } else {
+                    alert('Gagal menambah data: ' + res.error);
+                }
+            });
+    });
+
+    // ----- Global Search -----
+    document.getElementById("global-search").addEventListener("input", function () {
+        const term = this.value;
+        if (table) {
             if (term === "") {
                 table.clearFilter();
             } else {
-                table.setFilter(function(data) {
+                table.setFilter(function (data) {
                     const matchName = data["NAMA"] && data["NAMA"].toLowerCase().includes(term.toLowerCase());
                     const matchJabatan = data["JABATAN"] && data["JABATAN"].toLowerCase().includes(term.toLowerCase());
                     return matchName || matchJabatan;
@@ -79,9 +303,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Export PDF
-    document.getElementById("download-pdf").addEventListener("click", function(){
-        if(table) {
+    // ----- Export PDF -----
+    document.getElementById("download-pdf").addEventListener("click", function () {
+        if (table) {
             table.download("pdf", "Data_Pegawai.pdf", {
                 orientation: "landscape",
                 title: "Daftar Data Pegawai Kemenag Metro"
@@ -89,13 +313,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Export Excel
-    document.getElementById("download-xlsx").addEventListener("click", function(){
-        if(table) {
-            table.download("xlsx", "Data_Pegawai.xlsx", {sheetName: "Data Pegawai"});
+    // ----- Export Excel -----
+    document.getElementById("download-xlsx").addEventListener("click", function () {
+        if (table) {
+            table.download("xlsx", "Data_Pegawai.xlsx", { sheetName: "Data Pegawai" });
         }
     });
 
-    // Initial Load
+    // ----- Initial Load -----
     loadData();
 });
