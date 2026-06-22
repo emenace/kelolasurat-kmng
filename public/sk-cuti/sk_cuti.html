@@ -6,114 +6,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SK Cuti - Kemenag Metro</title>
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_simple.min.css" rel="stylesheet">
 
-    <!-- Tabulator CSS -->
-    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="../style.css">
-
-    <style>
-        .pegawai-info {
-            border: 1px solid #dee2e6;
-            padding: 12px;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-            margin-top: 8px;
-        }
-
-        .autocomplete-results {
-            position: absolute;
-            z-index: 1000;
-            background: white;
-            border: 1px solid #ccc;
-            max-height: 200px;
-            overflow-y: auto;
-            width: calc(100% - 30px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .autocomplete-item {
-            padding: 8px;
-            cursor: pointer;
-        }
-
-        .autocomplete-item:hover {
-            background-color: #f0f0f0;
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-kemenag: #006b3f;
+            --color-kemenag-dark: #004d2d;
+            --color-kemenag-light: #28a745;
         }
     </style>
+    <link rel="stylesheet" href="../style.css">
 </head>
 
-<body>
+<body class="bg-gray-50 min-h-screen">
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg kemenag-header navbar-dark mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="../index.html">
-                <img src="../assets/Kementerian_Agama_new_logo.png" alt="Logo Kemenag"
-                    style="height: 40px; margin-right: 10px;">
-                <i class="bi bi-arrow-left-circle me-2"></i>
-                Kembali
-            </a>
-            <span class="navbar-text text-white fw-bold">
-                Buat SK Cuti
-            </span>
+    <nav class="bg-gradient-to-r from-kemenag to-kemenag-dark shadow-lg mb-6">
+        <div class="max-w-full mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between h-14">
+                <a href="../index.html" class="flex items-center gap-2 text-white font-semibold no-underline hover:text-green-200 transition-colors">
+                    <img src="../assets/Kementerian_Agama_new_logo.png" alt="Logo" class="h-8">
+                    <i class="bi bi-arrow-left-circle"></i>
+                    <span>Kembali</span>
+                </a>
+                <span class="text-white font-bold text-sm sm:text-base">Buat SK Cuti</span>
+            </div>
         </div>
     </nav>
 
-    <div class="container-fluid px-4">
-        <div class="row">
+    <div class="max-w-full mx-auto px-4 sm:px-6">
+        <div class="flex flex-col lg:flex-row gap-6">
             <!-- Form Section -->
-            <div class="col-lg-5 mb-4">
-                <div class="card card-form">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <div><i class="bi bi-file-earmark-text me-2"></i>Form SK Cuti</div>
-                        <button class="btn btn-sm btn-outline-secondary d-none" id="btn-cancel-edit">Batal Edit</button>
+            <div class="lg:w-[440px] shrink-0">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                    <div class="px-5 py-3 border-b-2 border-kemenag bg-gray-50 flex justify-between items-center">
+                        <h2 class="text-sm font-bold text-kemenag-dark flex items-center gap-2">
+                            <i class="bi bi-file-earmark-text"></i>Form SK Cuti
+                        </h2>
+                        <button id="btn-cancel-edit" class="hidden px-3 py-1 rounded-lg bg-gray-200 text-gray-700 text-xs font-medium hover:bg-gray-300 transition">Batal Edit</button>
                     </div>
-                    <div class="card-body">
+                    <div class="p-5">
                         <form id="formSKCuti">
                             <input type="hidden" id="id_cuti">
 
                             <!-- Section 1 -->
-                            <h6 class="fw-bold text-success border-bottom pb-2 mb-3">1. Nomor Surat Cuti</h6>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Nomor SK Cuti</label>
-                                    <input type="text" class="form-control" id="cuti_nomor" placeholder="Loading..."
-                                        required>
+                            <h3 class="text-sm font-bold text-kemenag border-b border-green-200 pb-2 mb-3">1. Nomor Surat Cuti</h3>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nomor SK Cuti</label>
+                                    <input type="text" id="cuti_nomor" placeholder="Loading..." required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Tanggal Pembuatan</label>
-                                    <input type="date" class="form-control" id="cuti_createdate" required>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pembuatan</label>
+                                    <input type="date" id="cuti_createdate" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
                             </div>
 
                             <!-- Section 2 -->
-                            <h6 class="fw-bold text-success border-bottom pb-2 mb-3 mt-4">2. Data Pegawai</h6>
-                            <div class="mb-3 position-relative">
-                                <label class="form-label">Cari Nama Pegawai</label>
-                                <input type="text" class="form-control" id="search_pegawai"
-                                    placeholder="Ketik nama pegawai..." autocomplete="off">
-                                <div class="autocomplete-results d-none" id="auto-pegawai"></div>
+                            <h3 class="text-sm font-bold text-kemenag border-b border-green-200 pb-2 mb-3 mt-5">2. Data Pegawai</h3>
+                            <div class="mb-3 relative">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Cari Nama Pegawai</label>
+                                <input type="text" id="search_pegawai" placeholder="Ketik nama pegawai..." autocomplete="off" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
+                                <div class="autocomplete-results hidden" id="auto-pegawai"></div>
                             </div>
-                            <div id="pegawai-info-box" class="pegawai-info d-none">
-                                <div class="row g-2">
-                                    <div class="col-md-6"><strong>Nama:</strong> <span id="display_nama">-</span></div>
-                                    <div class="col-md-6"><strong>NIP:</strong> <span id="display_nip">-</span></div>
-                                    <div class="col-md-6"><strong>Pangkat:</strong> <span id="display_pangkat">-</span>
-                                    </div>
-                                    <div class="col-md-6"><strong>Golongan:</strong> <span
-                                            id="display_golongan">-</span></div>
-                                    <div class="col-12"><strong>Jabatan:</strong> <span id="display_jabatan">-</span>
-                                    </div>
+                            <div id="pegawai-info-box" class="pegawai-info hidden">
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div><strong>Nama:</strong> <span id="display_nama">-</span></div>
+                                    <div><strong>NIP:</strong> <span id="display_nip">-</span></div>
+                                    <div><strong>Pangkat:</strong> <span id="display_pangkat">-</span></div>
+                                    <div><strong>Golongan:</strong> <span id="display_golongan">-</span></div>
+                                    <div class="col-span-2"><strong>Jabatan:</strong> <span id="display_jabatan">-</span></div>
                                 </div>
                             </div>
                             <input type="hidden" id="pegawai_nama">
@@ -125,83 +90,68 @@
                             <input type="hidden" id="pegawai_m_b">
 
                             <!-- Section 3 -->
-                            <h6 class="fw-bold text-success border-bottom pb-2 mb-3 mt-4">3. Data Cuti</h6>
+                            <h3 class="text-sm font-bold text-kemenag border-b border-green-200 pb-2 mb-3 mt-5">3. Data Cuti</h3>
                             <div class="mb-3">
-                                <label class="form-label">Alasan Cuti</label>
-                                <input type="text" class="form-control" id="cuti_alasan" required>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Alasan Cuti</label>
+                                <input type="text" id="cuti_alasan" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                             </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="check_manual_tanggal">
-                                <label class="form-check-label" for="check_manual_tanggal">
-                                    Input Tanggal Secara Manual
-                                </label>
-                            </div>
-                            <div class="row mb-3" id="date_picker_container">
-                                <div class="col-md-6">
-                                    <label class="form-label">Tanggal Awal Cuti</label>
-                                    <input type="date" class="form-control" id="cuti_startdate">
+                            <label class="flex items-center gap-2 mb-2 cursor-pointer">
+                                <input type="checkbox" id="check_manual_tanggal" class="rounded border-gray-300 text-kemenag focus:ring-kemenag">
+                                <span class="text-sm text-gray-600">Input Tanggal Secara Manual</span>
+                            </label>
+                            <div id="date_picker_container" class="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Awal Cuti</label>
+                                    <input type="date" id="cuti_startdate" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Tanggal Akhir Cuti</label>
-                                    <input type="date" class="form-control" id="cuti_enddate">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Akhir Cuti</label>
+                                    <input type="date" id="cuti_enddate" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
                             </div>
-                            <div class="mb-3 d-none" id="manual_date_container">
-                                <label class="form-label">Tanggal Cuti Manual</label>
-                                <input type="text" class="form-control" id="cuti_tanggalmanual"
-                                    placeholder="Contoh: 1 s.d 15 Mei 2026">
+                            <div id="manual_date_container" class="hidden mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Cuti Manual</label>
+                                <input type="text" id="cuti_tanggalmanual" placeholder="Contoh: 1 s.d 15 Mei 2026" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Lama Cuti (hari)</label>
-                                <input type="number" class="form-control" id="cuti_daylong" required>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Lama Cuti (hari)</label>
+                                <input type="number" id="cuti_daylong" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Alamat Selama Cuti <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="cuti_alamatcuti"
-                                    placeholder="Masukkan alamat selama cuti" required>
-                                <div class="invalid-feedback">Form value required</div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Selama Cuti <span class="text-red-500">*</span></label>
+                                <input type="text" id="cuti_alamatcuti" placeholder="Masukkan alamat selama cuti" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                             </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Nomor HP <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="cuti_nohp" placeholder="08xxxxxxxxxx"
-                                        required>
-                                    <div class="invalid-feedback">Form value required</div>
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nomor HP <span class="text-red-500">*</span></label>
+                                    <input type="text" id="cuti_nohp" placeholder="08xxxxxxxxxx" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Unit Kerja <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="pegawai_unitkerja"
-                                        placeholder="Masukkan unit kerja" required>
-                                    <div class="invalid-feedback">Form value required</div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Unit Kerja <span class="text-red-500">*</span></label>
+                                    <input type="text" id="pegawai_unitkerja" placeholder="Masukkan unit kerja" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
                             </div>
-                            <div class="mb-3 position-relative">
-                                <label class="form-label">Atasan Langsung</label>
-                                <input type="text" class="form-control" id="search_atasan"
-                                    placeholder="Ketik nama atasan..." autocomplete="off">
-                                <div class="autocomplete-results d-none" id="auto-atasan"></div>
+                            <div class="mb-3 relative">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Atasan Langsung</label>
+                                <input type="text" id="search_atasan" placeholder="Ketik nama atasan..." autocomplete="off" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
+                                <div class="autocomplete-results hidden" id="auto-atasan"></div>
                             </div>
-                            <div id="atasan-info-box" class="pegawai-info d-none mb-3">
-                                <div class="row g-2">
-                                    <div class="col-md-6"><strong>Nama:</strong> <span id="display_atasan_nama">-</span>
-                                    </div>
-                                    <div class="col-md-6"><strong>NIP:</strong> <span id="display_atasan_nip">-</span>
-                                    </div>
+                            <div id="atasan-info-box" class="pegawai-info hidden mb-3">
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div><strong>Nama:</strong> <span id="display_atasan_nama">-</span></div>
+                                    <div><strong>NIP:</strong> <span id="display_atasan_nip">-</span></div>
                                 </div>
                             </div>
                             <input type="hidden" id="atasan_nama">
                             <input type="hidden" id="atasan_nip">
-                            <div class="mb-3">
-                                <label class="form-label">Jabatan Atasan Langsung <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="cuti_atasan_jabatan" value="Kepala"
-                                    required>
-                                <div class="invalid-feedback">Form value required</div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Jabatan Atasan Langsung <span class="text-red-500">*</span></label>
+                                <input type="text" id="cuti_atasan_jabatan" value="Kepala" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                             </div>
 
-                            <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-kemenag btn-lg" id="btn-submit">
-                                    <i class="bi bi-save me-2"></i>Simpan SK Cuti
+                            <div class="mt-5">
+                                <button type="submit" id="btn-submit" class="w-full py-2.5 rounded-lg bg-kemenag text-white font-semibold text-sm hover:bg-kemenag-dark transition-colors flex items-center justify-center gap-2">
+                                    <i class="bi bi-save"></i>Simpan SK Cuti
                                 </button>
                             </div>
                         </form>
@@ -210,14 +160,15 @@
             </div>
 
             <!-- Table Section -->
-            <div class="col-lg-7">
-                <div class="card card-form h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div><i class="bi bi-table me-2"></i>Daftar SK Cuti</div>
-                        <input type="text" id="global-search" class="form-control form-control-sm w-auto"
-                            placeholder="Cari data...">
+            <div class="flex-1 min-w-0">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 h-full">
+                    <div class="px-5 py-3 border-b-2 border-kemenag bg-gray-50 flex justify-between items-center flex-wrap gap-2">
+                        <h2 class="text-sm font-bold text-kemenag-dark flex items-center gap-2">
+                            <i class="bi bi-table"></i>Daftar SK Cuti
+                        </h2>
+                        <input type="text" id="global-search" placeholder="Cari data..." class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition w-40">
                     </div>
-                    <div class="card-body p-0">
+                    <div class="overflow-x-auto">
                         <div id="table-sk-cuti"></div>
                     </div>
                 </div>
@@ -225,11 +176,7 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
-
-    <!-- Page Logic -->
     <script src="sk_cuti.js"></script>
 </body>
 

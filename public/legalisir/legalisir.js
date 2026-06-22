@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Custom formatter for action buttons
     var actionFormatter = function(cell, formatterParams, onRendered){
-        return `<button class="btn btn-sm btn-primary btn-edit me-1" title="Edit"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-danger btn-delete" title="Hapus"><i class="bi bi-trash"></i></button>`;
+        return `<button class="btn-edit px-2 py-1 rounded bg-amber-500 text-white text-xs font-medium hover:bg-amber-600 transition mr-1" title="Edit"><i class="bi bi-pencil"></i></button>
+                <button class="btn-delete px-2 py-1 rounded bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition" title="Hapus"><i class="bi bi-trash"></i></button>`;
     };
 
     // Initialize Tabulator
@@ -115,9 +115,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('yang_menandatangani').value = data.yang_menandatangani;
         document.getElementById('keterangan').value = data.keterangan;
 
-        document.getElementById('btn-submit').innerHTML = '<i class="bi bi-save me-2"></i>Update Data';
-        document.getElementById('btn-submit').classList.replace('btn-kemenag', 'btn-warning');
-        document.getElementById('btn-cancel-edit').classList.remove('d-none');
+        document.getElementById('btn-submit').innerHTML = '<i class="bi bi-save"></i> Update Data';
+        document.getElementById('btn-submit').classList.replace('bg-kemenag', 'bg-amber-500');
+        document.getElementById('btn-submit').classList.replace('hover:bg-kemenag-dark', 'hover:bg-amber-600');
+        document.getElementById('btn-cancel-edit').classList.remove('hidden');
     }
 
     function deleteData(id) {
@@ -138,9 +139,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('formLegalisir').reset();
         document.getElementById('id_legalisir').value = '';
         document.getElementById('tanggal_surat').valueAsDate = new Date();
-        document.getElementById('btn-submit').innerHTML = '<i class="bi bi-save me-2"></i>Simpan Data';
-        document.getElementById('btn-submit').classList.replace('btn-warning', 'btn-kemenag');
-        document.getElementById('btn-cancel-edit').classList.add('d-none');
+        document.getElementById('btn-submit').innerHTML = '<i class="bi bi-save"></i> Simpan Data';
+        document.getElementById('btn-submit').classList.replace('bg-amber-500', 'bg-kemenag');
+        document.getElementById('btn-submit').classList.replace('hover:bg-amber-600', 'hover:bg-kemenag-dark');
+        document.getElementById('btn-cancel-edit').classList.add('hidden');
     }
 
     document.getElementById('btn-cancel-edit').addEventListener('click', resetForm);

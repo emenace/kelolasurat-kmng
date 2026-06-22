@@ -49,9 +49,9 @@ document.addEventListener('DOMContentLoaded', function () {
             width: 130,
             frozen: true,
             formatter: function (cell) {
-                return '<div class="d-flex gap-1 justify-content-center">' +
-                    '<button class="btn btn-xs btn-warning btn-edit-row" style="font-size:11px;padding:2px 7px;">Edit</button>' +
-                    '<button class="btn btn-xs btn-danger btn-delete-row" style="font-size:11px;padding:2px 7px;">Hapus</button>' +
+                return '<div class="flex gap-1 justify-center">' +
+                    '<button class="btn-edit-row px-2 py-0.5 rounded bg-amber-500 text-white text-[11px] font-medium hover:bg-amber-600 transition">Edit</button>' +
+                    '<button class="btn-delete-row px-2 py-0.5 rounded bg-red-500 text-white text-[11px] font-medium hover:bg-red-600 transition">Hapus</button>' +
                     '</div>';
             },
             cellClick: function (e, cell) {
@@ -125,8 +125,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function enterEditMode() {
         isEditMode = true;
         document.getElementById('btn-update-data').textContent = 'Selesai Edit';
-        document.getElementById('btn-update-data').classList.replace('btn-warning', 'btn-secondary');
-        document.getElementById('btn-tambah-data').classList.remove('d-none');
+        document.getElementById('btn-update-data').classList.replace('bg-amber-500', 'bg-gray-500');
+        document.getElementById('btn-update-data').classList.replace('hover:bg-amber-600', 'hover:bg-gray-600');
+        document.getElementById('btn-tambah-data').classList.remove('hidden');
 
         loadData(function (data) {
             if (table) { table.destroy(); table = null; }
@@ -154,19 +155,18 @@ document.addEventListener('DOMContentLoaded', function () {
     function exitEditMode() {
         isEditMode = false;
         document.getElementById('btn-update-data').textContent = 'Update Data';
-        document.getElementById('btn-update-data').classList.replace('btn-secondary', 'btn-warning');
-        document.getElementById('btn-tambah-data').classList.add('d-none');
+        document.getElementById('btn-update-data').classList.replace('bg-gray-500', 'bg-amber-500');
+        document.getElementById('btn-update-data').classList.replace('hover:bg-gray-600', 'hover:bg-amber-600');
+        document.getElementById('btn-tambah-data').classList.add('hidden');
         loadData(function (data) { initTable(data); });
     }
 
     // ----- Update Data button -----
-    let verifyModalInstance = null;
     document.getElementById('btn-update-data').addEventListener('click', function () {
         if (!isEditMode) {
             document.getElementById('input-pass-key').value = '';
-            document.getElementById('verify-key-error').classList.add('d-none');
-            if(!verifyModalInstance) verifyModalInstance = new bootstrap.Modal(document.getElementById('verifyKeyModal'));
-            verifyModalInstance.show();
+            document.getElementById('verify-key-error').classList.add('hidden');
+            showModal('verifyKeyModal');
         } else {
             exitEditMode();
         }
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btn-submit-key').addEventListener('click', function() {
         const key = document.getElementById('input-pass-key').value;
         const errorEl = document.getElementById('verify-key-error');
-        
+
         fetch('/api/verify-key', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -184,16 +184,16 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(r => r.json())
         .then(res => {
             if(res.message === 'success') {
-                errorEl.classList.add('d-none');
-                verifyModalInstance.hide();
+                errorEl.classList.add('hidden');
+                hideModal('verifyKeyModal');
                 enterEditMode();
             } else {
-                errorEl.classList.remove('d-none');
+                errorEl.classList.remove('hidden');
                 errorEl.textContent = res.error || "Kode kunci tidak sesuai, perubahan tidak diperbolehkan";
             }
         })
         .catch(err => {
-            errorEl.classList.remove('d-none');
+            errorEl.classList.remove('hidden');
             errorEl.textContent = "Terjadi kesalahan sistem";
         });
     });
@@ -229,8 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (el) el.value = rowData[def.field] || '';
         });
 
-        const modal = new bootstrap.Modal(document.getElementById('editRowModal'));
-        modal.show();
+        showModal('editRowModal');
     }
 
     document.getElementById('btn-save-edit').addEventListener('click', function () {
@@ -249,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(r => r.json())
             .then(res => {
                 if (res.message === 'success') {
-                    bootstrap.Modal.getInstance(document.getElementById('editRowModal')).hide();
+                    hideModal('editRowModal');
                     loadData(function (data) { table.setData(data); });
                 } else {
                     alert('Gagal menyimpan: ' + res.error);
@@ -260,8 +259,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ----- Add Row Modal -----
     function openAddRowModal() {
         document.getElementById('add-form').reset();
-        const modal = new bootstrap.Modal(document.getElementById('addRowModal'));
-        modal.show();
+        showModal('addRowModal');
     }
 
     document.getElementById('btn-save-add').addEventListener('click', function () {
@@ -279,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(r => r.json())
             .then(res => {
                 if (res.message === 'success') {
-                    bootstrap.Modal.getInstance(document.getElementById('addRowModal')).hide();
+                    hideModal('addRowModal');
                     loadData(function (data) { table.setData(data); });
                 } else {
                     alert('Gagal menambah data: ' + res.error);

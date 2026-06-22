@@ -6,306 +6,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pegawai - Kemenag Metro</title>
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_simple.min.css" rel="stylesheet">
 
-    <!-- Tabulator CSS -->
-    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-kemenag: #006b3f;
+            --color-kemenag-dark: #004d2d;
+            --color-kemenag-light: #28a745;
+        }
+    </style>
     <link rel="stylesheet" href="../style.css">
 </head>
 
-<body>
+<body class="bg-gray-50 min-h-screen">
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg kemenag-header navbar-dark mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="../index.html">
-                <img src="../assets/Kementerian_Agama_new_logo.png" alt="Logo Kemenag" style="height: 40px; margin-right: 10px;">
-                <i class="bi bi-arrow-left-circle me-2"></i>
-                Kembali
-            </a>
-            <span class="navbar-text text-white fw-bold">
-                Data Pegawai
-            </span>
+    <nav class="bg-gradient-to-r from-kemenag to-kemenag-dark shadow-lg mb-6">
+        <div class="max-w-full mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between h-14">
+                <a href="../index.html" class="flex items-center gap-2 text-white font-semibold no-underline hover:text-green-200 transition-colors">
+                    <img src="../assets/Kementerian_Agama_new_logo.png" alt="Logo" class="h-8">
+                    <i class="bi bi-arrow-left-circle"></i>
+                    <span>Kembali</span>
+                </a>
+                <span class="text-white font-bold text-sm sm:text-base">Data Pegawai</span>
+            </div>
         </div>
     </nav>
 
-    <div class="container-fluid px-4">
-        <div class="row">
-            <!-- Table Section -->
-            <div class="col-12">
-                <div class="card card-form h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div><i class="bi bi-people me-2"></i>Daftar Data Pegawai</div>
-                        <div class="d-flex gap-2 align-items-center flex-wrap">
-                            <input type="text" id="global-search" class="form-control form-control-sm"
-                                placeholder="Cari Nama / Jabatan...">
-                            <button id="btn-tambah-data" class="btn btn-sm btn-success text-nowrap d-none">
-                                <i class="bi bi-plus-circle me-1"></i>Tambah Data
-                            </button>
-                            <button id="btn-update-data" class="btn btn-sm btn-warning text-nowrap">
-                                <i class="bi bi-pencil-square me-1"></i>Update Data
-                            </button>
-                            <button id="download-pdf" class="btn btn-sm btn-outline-danger text-nowrap">Export PDF</button>
-                            <button id="download-xlsx" class="btn btn-sm btn-outline-primary text-nowrap">Export Excel</button>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div id="table-pegawai"></div>
-                    </div>
+    <div class="max-w-full mx-auto px-4 sm:px-6">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+            <div class="px-5 py-3 border-b-2 border-kemenag bg-gray-50 flex justify-between items-center flex-wrap gap-2">
+                <h2 class="text-sm font-bold text-kemenag-dark flex items-center gap-2">
+                    <i class="bi bi-people"></i>Daftar Data Pegawai
+                </h2>
+                <div class="flex gap-2 items-center flex-wrap">
+                    <input type="text" id="global-search" placeholder="Cari Nama / Jabatan..." class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition w-48">
+                    <button id="btn-tambah-data" class="hidden px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition whitespace-nowrap">
+                        <i class="bi bi-plus-circle mr-1"></i>Tambah Data
+                    </button>
+                    <button id="btn-update-data" class="px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-semibold hover:bg-amber-600 transition whitespace-nowrap">
+                        <i class="bi bi-pencil-square mr-1"></i>Update Data
+                    </button>
+                    <button id="download-pdf" class="px-3 py-1.5 rounded-lg border border-red-300 text-red-600 text-xs font-medium hover:bg-red-50 transition whitespace-nowrap">Export PDF</button>
+                    <button id="download-xlsx" class="px-3 py-1.5 rounded-lg border border-blue-300 text-blue-600 text-xs font-medium hover:bg-blue-50 transition whitespace-nowrap">Export Excel</button>
                 </div>
+            </div>
+            <div class="overflow-x-auto">
+                <div id="table-pegawai"></div>
             </div>
         </div>
     </div>
 
     <!-- ===== VERIFY KEY MODAL ===== -->
-    <div class="modal fade" id="verifyKeyModal" tabindex="-1" aria-labelledby="verifyKeyModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="verifyKeyModalLabel">
-                        <i class="bi bi-shield-lock me-2"></i>Otorisasi Perubahan Data
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    <div id="verifyKeyModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div class="px-6 py-4 bg-red-600 rounded-t-xl flex items-center justify-between">
+                <h3 class="text-white font-bold flex items-center gap-2">
+                    <i class="bi bi-shield-lock"></i>Otorisasi Perubahan Data
+                </h3>
+                <button onclick="hideModal('verifyKeyModal')" class="text-white/80 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-500 mb-4">Masukan kode kunci untuk melakukan perubahan data pegawai.</p>
+                <div>
+                    <label for="input-pass-key" class="block text-sm font-semibold text-gray-700 mb-1">Kode Kunci</label>
+                    <input type="password" id="input-pass-key" placeholder="Ketik kode kunci..." class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:border-red-500 outline-none transition">
+                    <div id="verify-key-error" class="hidden text-red-600 text-sm mt-2">Kode kunci tidak sesuai, perubahan tidak diperbolehkan</div>
                 </div>
-                <div class="modal-body">
-                    <p class="small text-muted mb-3">Masukan kode kunci untuk melakukan perubahan data pegawai.</p>
-                    <div class="mb-3">
-                        <label for="input-pass-key" class="form-label fw-semibold">Kode Kunci</label>
-                        <input type="password" class="form-control" id="input-pass-key" placeholder="Ketik kode kunci...">
-                        <div id="verify-key-error" class="text-danger small mt-2 d-none">Kode kunci tidak sesuai, perubahan tidak diperbolehkan</div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-danger" id="btn-submit-key">Verifikasi</button>
-                </div>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 rounded-b-xl flex justify-end gap-2">
+                <button onclick="hideModal('verifyKeyModal')" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition">Batal</button>
+                <button id="btn-submit-key" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition">Verifikasi</button>
             </div>
         </div>
     </div>
 
     <!-- ===== EDIT ROW MODAL ===== -->
-    <div class="modal fade" id="editRowModal" tabindex="-1" aria-labelledby="editRowModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header bg-warning">
-                    <h5 class="modal-title" id="editRowModalLabel">
-                        <i class="bi bi-pencil me-2"></i><span id="edit-modal-title">Edit Data</span>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div id="editRowModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 bg-amber-500 rounded-t-xl flex items-center justify-between sticky top-0 z-10">
+                <h3 class="text-white font-bold flex items-center gap-2">
+                    <i class="bi bi-pencil"></i><span id="edit-modal-title">Edit Data</span>
+                </h3>
+                <button onclick="hideModal('editRowModal')" class="text-white/80 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="p-6">
+                <input type="hidden" id="edit-modal-no">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">No</label><input type="text" id="edit-field-NO" placeholder="No" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="sm:col-span-2"><label class="block text-xs font-semibold text-gray-600 mb-1">Nama</label><input type="text" id="edit-field-NAMA" placeholder="Nama Lengkap" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">NIP Lama</label><input type="text" id="edit-field-NIP_LAMA" placeholder="NIP Lama" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">NIP Baru</label><input type="text" id="edit-field-NIP_BARU" placeholder="NIP Baru" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="sm:col-span-2"><label class="block text-xs font-semibold text-gray-600 mb-1">Formatted NIP</label><input type="text" id="edit-field-FORMATTED_NIP" placeholder="Formatted NIP" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Gol/Ruang</label><input type="text" id="edit-field-GOLRU" placeholder="IV/a" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Pangkat</label><input type="text" id="edit-field-PANGKAT" placeholder="Pangkat" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">TMT Gol/Ruang</label><input type="text" id="edit-field-TMT_GOLRU" placeholder="YYYY-MM-DD" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="sm:col-span-2"><label class="block text-xs font-semibold text-gray-600 mb-1">Satuan Kerja</label><input type="text" id="edit-field-SATKER" placeholder="Satuan Kerja" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="md:col-span-3"><label class="block text-xs font-semibold text-gray-600 mb-1">Jabatan</label><input type="text" id="edit-field-JABATAN" placeholder="Jabatan" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">TMT Jabatan</label><input type="text" id="edit-field-TMT_JABATAN" placeholder="YYYY-MM-DD" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Masa Kerja Thn</label><input type="number" id="edit-field-THN" placeholder="0" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Masa Kerja Bln</label><input type="number" id="edit-field-BLN" placeholder="0" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="sm:col-span-2"><label class="block text-xs font-semibold text-gray-600 mb-1">Pendidikan Terakhir</label><input type="text" id="edit-field-PENDIDIKAN_TERAKHIR" placeholder="Nama Institusi" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Tahun Pendidikan</label><input type="number" id="edit-field-THN_PENDIDIKAN" placeholder="2000" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Jenis Pendidikan</label><input type="text" id="edit-field-JENIS_PENDIDIKAN" placeholder="S-1/Sarjana" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Lahir</label><input type="text" id="edit-field-TGL_LAHIR" placeholder="YYYY-MM-DD" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">TMT Pensiun</label><input type="text" id="edit-field-TMT_PENSIUN" placeholder="DD-MM-YYYY" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="sm:col-span-2"><label class="block text-xs font-semibold text-gray-600 mb-1">Keterangan</label><input type="text" id="edit-field-KET" placeholder="Keterangan" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
                 </div>
-                <div class="modal-body">
-                    <input type="hidden" id="edit-modal-no">
-                    <div class="row g-3">
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">No</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-NO" placeholder="No">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Nama</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-NAMA" placeholder="Nama Lengkap">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">NIP Lama</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-NIP_LAMA" placeholder="NIP Lama">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">NIP Baru</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-NIP_BARU" placeholder="NIP Baru">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Formatted NIP</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-FORMATTED_NIP" placeholder="Formatted NIP">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">Gol/Ruang</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-GOLRU" placeholder="IV/a">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Pangkat</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-PANGKAT" placeholder="Pangkat">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">TMT Gol/Ruang</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-TMT_GOLRU" placeholder="YYYY-MM-DD">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Satuan Kerja</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-SATKER" placeholder="Satuan Kerja">
-                        </div>
-                        <div class="col-md-8">
-                            <label class="form-label small fw-semibold">Jabatan</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-JABATAN" placeholder="Jabatan">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">TMT Jabatan</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-TMT_JABATAN" placeholder="YYYY-MM-DD">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">Masa Kerja Thn</label>
-                            <input type="number" class="form-control form-control-sm" id="edit-field-THN" placeholder="0">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">Masa Kerja Bln</label>
-                            <input type="number" class="form-control form-control-sm" id="edit-field-BLN" placeholder="0">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Pendidikan Terakhir</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-PENDIDIKAN_TERAKHIR" placeholder="Nama Institusi">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">Tahun Pendidikan</label>
-                            <input type="number" class="form-control form-control-sm" id="edit-field-THN_PENDIDIKAN" placeholder="2000">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Jenis Pendidikan</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-JENIS_PENDIDIKAN" placeholder="S-1/Sarjana">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">Tanggal Lahir</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-TGL_LAHIR" placeholder="YYYY-MM-DD">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">TMT Pensiun</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-TMT_PENSIUN" placeholder="DD-MM-YYYY">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Keterangan</label>
-                            <input type="text" class="form-control form-control-sm" id="edit-field-KET" placeholder="Keterangan">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-warning" id="btn-save-edit">
-                        <i class="bi bi-save me-1"></i>Simpan Perubahan
-                    </button>
-                </div>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 rounded-b-xl flex justify-end gap-2 sticky bottom-0">
+                <button onclick="hideModal('editRowModal')" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition">Batal</button>
+                <button id="btn-save-edit" class="px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition flex items-center gap-1">
+                    <i class="bi bi-save"></i>Simpan Perubahan
+                </button>
             </div>
         </div>
     </div>
 
     <!-- ===== ADD ROW MODAL ===== -->
-    <div class="modal fade" id="addRowModal" tabindex="-1" aria-labelledby="addRowModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="addRowModalLabel">
-                        <i class="bi bi-plus-circle me-2"></i>Tambah Data Pegawai Baru
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    <div id="addRowModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-4 bg-emerald-600 rounded-t-xl flex items-center justify-between sticky top-0 z-10">
+                <h3 class="text-white font-bold flex items-center gap-2">
+                    <i class="bi bi-plus-circle"></i>Tambah Data Pegawai Baru
+                </h3>
+                <button onclick="hideModal('addRowModal')" class="text-white/80 hover:text-white text-xl">&times;</button>
+            </div>
+            <div class="p-6">
+                <form id="add-form">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">No</label><input type="text" id="add-field-NO" placeholder="No" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="sm:col-span-2"><label class="block text-xs font-semibold text-gray-600 mb-1">Nama</label><input type="text" id="add-field-NAMA" placeholder="Nama Lengkap" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">NIP Lama</label><input type="text" id="add-field-NIP_LAMA" placeholder="NIP Lama" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">NIP Baru</label><input type="text" id="add-field-NIP_BARU" placeholder="NIP Baru" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="sm:col-span-2"><label class="block text-xs font-semibold text-gray-600 mb-1">Formatted NIP</label><input type="text" id="add-field-FORMATTED_NIP" placeholder="Formatted NIP" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Gol/Ruang</label><input type="text" id="add-field-GOLRU" placeholder="IV/a" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Pangkat</label><input type="text" id="add-field-PANGKAT" placeholder="Pangkat" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">TMT Gol/Ruang</label><input type="text" id="add-field-TMT_GOLRU" placeholder="YYYY-MM-DD" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="sm:col-span-2"><label class="block text-xs font-semibold text-gray-600 mb-1">Satuan Kerja</label><input type="text" id="add-field-SATKER" placeholder="Satuan Kerja" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="md:col-span-3"><label class="block text-xs font-semibold text-gray-600 mb-1">Jabatan</label><input type="text" id="add-field-JABATAN" placeholder="Jabatan" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">TMT Jabatan</label><input type="text" id="add-field-TMT_JABATAN" placeholder="YYYY-MM-DD" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Masa Kerja Thn</label><input type="number" id="add-field-THN" placeholder="0" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Masa Kerja Bln</label><input type="number" id="add-field-BLN" placeholder="0" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="sm:col-span-2"><label class="block text-xs font-semibold text-gray-600 mb-1">Pendidikan Terakhir</label><input type="text" id="add-field-PENDIDIKAN_TERAKHIR" placeholder="Nama Institusi" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Tahun Pendidikan</label><input type="number" id="add-field-THN_PENDIDIKAN" placeholder="2000" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Jenis Pendidikan</label><input type="text" id="add-field-JENIS_PENDIDIKAN" placeholder="S-1/Sarjana" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Lahir</label><input type="text" id="add-field-TGL_LAHIR" placeholder="YYYY-MM-DD" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div><label class="block text-xs font-semibold text-gray-600 mb-1">TMT Pensiun</label><input type="text" id="add-field-TMT_PENSIUN" placeholder="DD-MM-YYYY" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
+                    <div class="sm:col-span-2"><label class="block text-xs font-semibold text-gray-600 mb-1">Keterangan</label><input type="text" id="add-field-KET" placeholder="Keterangan" class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none"></div>
                 </div>
-                <div class="modal-body">
-                    <form id="add-form">
-                    <div class="row g-3">
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">No</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-NO" placeholder="No">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Nama</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-NAMA" placeholder="Nama Lengkap">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">NIP Lama</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-NIP_LAMA" placeholder="NIP Lama">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">NIP Baru</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-NIP_BARU" placeholder="NIP Baru">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Formatted NIP</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-FORMATTED_NIP" placeholder="Formatted NIP">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">Gol/Ruang</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-GOLRU" placeholder="IV/a">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Pangkat</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-PANGKAT" placeholder="Pangkat">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">TMT Gol/Ruang</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-TMT_GOLRU" placeholder="YYYY-MM-DD">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Satuan Kerja</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-SATKER" placeholder="Satuan Kerja">
-                        </div>
-                        <div class="col-md-8">
-                            <label class="form-label small fw-semibold">Jabatan</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-JABATAN" placeholder="Jabatan">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">TMT Jabatan</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-TMT_JABATAN" placeholder="YYYY-MM-DD">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">Masa Kerja Thn</label>
-                            <input type="number" class="form-control form-control-sm" id="add-field-THN" placeholder="0">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">Masa Kerja Bln</label>
-                            <input type="number" class="form-control form-control-sm" id="add-field-BLN" placeholder="0">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Pendidikan Terakhir</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-PENDIDIKAN_TERAKHIR" placeholder="Nama Institusi">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">Tahun Pendidikan</label>
-                            <input type="number" class="form-control form-control-sm" id="add-field-THN_PENDIDIKAN" placeholder="2000">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Jenis Pendidikan</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-JENIS_PENDIDIKAN" placeholder="S-1/Sarjana">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">Tanggal Lahir</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-TGL_LAHIR" placeholder="YYYY-MM-DD">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-semibold">TMT Pensiun</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-TMT_PENSIUN" placeholder="DD-MM-YYYY">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label small fw-semibold">Keterangan</label>
-                            <input type="text" class="form-control form-control-sm" id="add-field-KET" placeholder="Keterangan">
-                        </div>
-                    </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-success" id="btn-save-add">
-                        <i class="bi bi-save me-1"></i>Simpan Data
-                    </button>
-                </div>
+                </form>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 rounded-b-xl flex justify-end gap-2 sticky bottom-0">
+                <button onclick="hideModal('addRowModal')" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition">Batal</button>
+                <button id="btn-save-add" class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition flex items-center gap-1">
+                    <i class="bi bi-save"></i>Simpan Data
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Tabulator JS -->
+    <!-- Modal Helpers -->
+    <script>
+        function showModal(id) {
+            var el = document.getElementById(id);
+            el.classList.remove('hidden');
+            el.classList.add('flex');
+        }
+        function hideModal(id) {
+            var el = document.getElementById(id);
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+        }
+    </script>
+
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
-    <!-- SheetJS for Excel Export -->
     <script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
-    <!-- jsPDF and AutoTable for PDF Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
-    <!-- Page Logic -->
     <script src="data_pegawai.js"></script>
 </body>
 

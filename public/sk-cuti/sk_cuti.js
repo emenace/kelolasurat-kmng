@@ -24,11 +24,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (checkManualTanggal) {
         checkManualTanggal.addEventListener('change', function() {
             if (this.checked) {
-                datePickerContainer.classList.add('d-none');
-                manualDateContainer.classList.remove('d-none');
+                datePickerContainer.classList.add('hidden');
+                manualDateContainer.classList.remove('hidden');
             } else {
-                datePickerContainer.classList.remove('d-none');
-                manualDateContainer.classList.add('d-none');
+                datePickerContainer.classList.remove('hidden');
+                manualDateContainer.classList.add('hidden');
             }
         });
     }
@@ -91,12 +91,12 @@ document.addEventListener('DOMContentLoaded', function () {
     searchPegawai.addEventListener('input', function () {
         var val = searchPegawai.value.toLowerCase();
         autoPegawai.innerHTML = '';
-        if (!val) { autoPegawai.classList.add('d-none'); return; }
+        if (!val) { autoPegawai.classList.add('hidden'); return; }
         var matches = allPegawai.filter(function (p) {
             return p.NAMA && p.NAMA.toLowerCase().includes(val);
         });
         if (matches.length > 0) {
-            autoPegawai.classList.remove('d-none');
+            autoPegawai.classList.remove('hidden');
             matches.slice(0, 10).forEach(function (p) {
                 var div = document.createElement('div');
                 div.className = 'autocomplete-item';
@@ -116,14 +116,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('display_golongan').textContent = p.GOLRU || '-';
                     document.getElementById('display_jabatan').textContent = p.JABATAN || '-';
 
-                    pegawaiInfoBox.classList.remove('d-none');
+                    pegawaiInfoBox.classList.remove('hidden');
                     searchPegawai.value = '';
-                    autoPegawai.classList.add('d-none');
+                    autoPegawai.classList.add('hidden');
                 });
                 autoPegawai.appendChild(div);
             });
         } else {
-            autoPegawai.classList.add('d-none');
+            autoPegawai.classList.add('hidden');
         }
     });
 
@@ -135,12 +135,12 @@ document.addEventListener('DOMContentLoaded', function () {
     searchAtasan.addEventListener('input', function () {
         var val = searchAtasan.value.toLowerCase();
         autoAtasan.innerHTML = '';
-        if (!val) { autoAtasan.classList.add('d-none'); return; }
+        if (!val) { autoAtasan.classList.add('hidden'); return; }
         var matches = allPegawai.filter(function (p) {
             return p.NAMA && p.NAMA.toLowerCase().includes(val);
         });
         if (matches.length > 0) {
-            autoAtasan.classList.remove('d-none');
+            autoAtasan.classList.remove('hidden');
             matches.slice(0, 10).forEach(function (p) {
                 var div = document.createElement('div');
                 div.className = 'autocomplete-item';
@@ -152,21 +152,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('display_atasan_nama').textContent = p.NAMA || '-';
                     document.getElementById('display_atasan_nip').textContent = p["NIP BARU"] || '-';
 
-                    atasanInfoBox.classList.remove('d-none');
+                    atasanInfoBox.classList.remove('hidden');
                     searchAtasan.value = '';
-                    autoAtasan.classList.add('d-none');
+                    autoAtasan.classList.add('hidden');
                 });
                 autoAtasan.appendChild(div);
             });
         } else {
-            autoAtasan.classList.add('d-none');
+            autoAtasan.classList.add('hidden');
         }
     });
 
     // Hide autocomplete when clicking elsewhere
     document.addEventListener('click', function (e) {
-        if (e.target !== searchPegawai) autoPegawai.classList.add('d-none');
-        if (e.target !== searchAtasan) autoAtasan.classList.add('d-none');
+        if (e.target !== searchPegawai) autoPegawai.classList.add('hidden');
+        if (e.target !== searchAtasan) autoAtasan.classList.add('hidden');
     });
 
     // Auto-calculate lama cuti
@@ -259,12 +259,12 @@ document.addEventListener('DOMContentLoaded', function () {
         pegawaiUnitkerja.value = "";
         cutiAtasanJabatan.value = "";
         checkManualTanggal.checked = false;
-        datePickerContainer.classList.remove('d-none');
-        manualDateContainer.classList.add('d-none');
+        datePickerContainer.classList.remove('hidden');
+        manualDateContainer.classList.add('hidden');
         cutiTanggalmanual.value = "";
-        pegawaiInfoBox.classList.add('d-none');
-        atasanInfoBox.classList.add('d-none');
-        btnCancelEdit.classList.add('d-none');
+        pegawaiInfoBox.classList.add('hidden');
+        atasanInfoBox.classList.add('hidden');
+        btnCancelEdit.classList.add('hidden');
         cutiCreatedate.valueAsDate = new Date();
         loadLastNomor();
     }
@@ -273,11 +273,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Action formatter for table
     var actionFormatter = function (cell) {
-        return '<div class="d-flex gap-1 justify-content-center">'
-            + '<button class="btn btn-sm btn-warning btn-edit" title="Edit"><i class="bi bi-pencil"></i> Edit</button>'
-            + '<button class="btn btn-sm btn-success btn-generate" title="Generate Dokumen"><i class="bi bi-printer-fill"></i> Cetak</button>'
-            + '<button class="btn btn-sm btn-info btn-formulir" title="Formulir Cuti"><i class="bi bi-file-earmark-text"></i> Formulir</button>'
-            + '<button class="btn btn-sm btn-danger btn-delete" title="Hapus"><i class="bi bi-trash"></i> Hapus</button>'
+        return '<div class="flex gap-1 justify-center">'
+            + '<button class="btn-edit px-2 py-1 rounded bg-amber-500 text-white text-xs font-medium hover:bg-amber-600 transition"><i class="bi bi-pencil"></i> Edit</button>'
+            + '<button class="btn-generate px-2 py-1 rounded bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition"><i class="bi bi-printer-fill"></i> Cetak</button>'
+            + '<button class="btn-formulir px-2 py-1 rounded bg-sky-500 text-white text-xs font-medium hover:bg-sky-600 transition"><i class="bi bi-file-earmark-text"></i> Formulir</button>'
+            + '<button class="btn-delete px-2 py-1 rounded bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition"><i class="bi bi-trash"></i> Hapus</button>'
             + '</div>';
     };
 
@@ -328,13 +328,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (d.cuti_tanggalmanual) {
                             checkManualTanggal.checked = true;
                             cutiTanggalmanual.value = d.cuti_tanggalmanual;
-                            datePickerContainer.classList.add('d-none');
-                            manualDateContainer.classList.remove('d-none');
+                            datePickerContainer.classList.add('hidden');
+                            manualDateContainer.classList.remove('hidden');
                         } else {
                             checkManualTanggal.checked = false;
                             cutiTanggalmanual.value = '';
-                            datePickerContainer.classList.remove('d-none');
-                            manualDateContainer.classList.add('d-none');
+                            datePickerContainer.classList.remove('hidden');
+                            manualDateContainer.classList.add('hidden');
                         }
 
                         pegawaiNama.value = d.pegawai_nama;
@@ -350,20 +350,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         document.getElementById('display_pangkat').textContent = d.pegawai_pangkat || '-';
                         document.getElementById('display_golongan').textContent = d.pegawai_golongan || '-';
                         document.getElementById('display_jabatan').textContent = d.pegawai_jabatan || '-';
-                        pegawaiInfoBox.classList.remove('d-none');
+                        pegawaiInfoBox.classList.remove('hidden');
 
                         atasanNama.value = d.atasan_nama;
                         atasanNip.value = d.atasan_nip;
                         document.getElementById('display_atasan_nama').textContent = d.atasan_nama || '-';
                         document.getElementById('display_atasan_nip').textContent = d.atasan_nip || '-';
-                        atasanInfoBox.classList.remove('d-none');
+                        atasanInfoBox.classList.remove('hidden');
 
                         cutiAlamatcuti.value = d.cuti_alamatcuti || '';
                         cutiNohp.value = d.cuti_nohp || '';
                         pegawaiUnitkerja.value = d.pegawai_unitkerja || '';
                         cutiAtasanJabatan.value = d.cuti_atasan_jabatan || '';
 
-                        btnCancelEdit.classList.remove('d-none');
+                        btnCancelEdit.classList.remove('hidden');
                         window.scrollTo(0, 0);
                     }
                 });

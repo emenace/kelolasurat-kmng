@@ -65,18 +65,18 @@ document.addEventListener('DOMContentLoaded', function () {
         row.id = rowId;
 
         var html = '';
-        html += '<button type="button" class="btn btn-sm btn-danger btn-remove-row"><i class="bi bi-trash"></i></button>';
-        html += '<div class="mb-2 position-relative">';
-        html += '  <label class="form-label text-muted small mb-1">Cari Nama Pegawai</label>';
-        html += '  <input type="text" class="form-control form-control-sm search-pegawai" placeholder="Ketik nama pegawai..." autocomplete="off">';
-        html += '  <div class="autocomplete-results d-none" id="auto-' + rowId + '"></div>';
+        html += '<button type="button" class="btn-remove-row absolute top-2 right-2 px-2 py-1 rounded bg-red-500 text-white text-xs hover:bg-red-600 transition"><i class="bi bi-trash"></i></button>';
+        html += '<div class="mb-2 relative">';
+        html += '  <label class="block text-xs text-gray-500 mb-1">Cari Nama Pegawai</label>';
+        html += '  <input type="text" class="search-pegawai w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none" placeholder="Ketik nama pegawai..." autocomplete="off">';
+        html += '  <div class="autocomplete-results hidden" id="auto-' + rowId + '"></div>';
         html += '</div>';
-        html += '<div class="row g-2">';
-        html += '  <div class="col-md-6"><input type="text" class="form-control form-control-sm i-nama" placeholder="Nama" value="' + (prefillData ? prefillData.nama : '') + '"></div>';
-        html += '  <div class="col-md-6"><input type="text" class="form-control form-control-sm i-nip" placeholder="NIP" value="' + (prefillData ? prefillData.nip : '') + '"></div>';
-        html += '  <div class="col-md-4"><input type="text" class="form-control form-control-sm i-pangkat" placeholder="Pangkat" value="' + (prefillData ? prefillData.pangkat : '') + '"></div>';
-        html += '  <div class="col-md-4"><input type="text" class="form-control form-control-sm i-golongan" placeholder="Gol/Ruang" value="' + (prefillData ? prefillData.golongan : '') + '"></div>';
-        html += '  <div class="col-md-4"><input type="text" class="form-control form-control-sm i-jabatan" placeholder="Jabatan" value="' + (prefillData ? prefillData.jabatan : '') + '"></div>';
+        html += '<div class="grid grid-cols-2 md:grid-cols-5 gap-2">';
+        html += '  <div class="col-span-1"><input type="text" class="i-nama w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm" placeholder="Nama" value="' + (prefillData ? prefillData.nama : '') + '"></div>';
+        html += '  <div class="col-span-1"><input type="text" class="i-nip w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm" placeholder="NIP" value="' + (prefillData ? prefillData.nip : '') + '"></div>';
+        html += '  <div class="col-span-1"><input type="text" class="i-pangkat w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm" placeholder="Pangkat" value="' + (prefillData ? prefillData.pangkat : '') + '"></div>';
+        html += '  <div class="col-span-1"><input type="text" class="i-golongan w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm" placeholder="Gol/Ruang" value="' + (prefillData ? prefillData.golongan : '') + '"></div>';
+        html += '  <div class="col-span-1"><input type="text" class="i-jabatan w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm" placeholder="Jabatan" value="' + (prefillData ? prefillData.jabatan : '') + '"></div>';
         html += '</div>';
 
         row.innerHTML = html;
@@ -99,14 +99,14 @@ document.addEventListener('DOMContentLoaded', function () {
             var val = searchInput.value.toLowerCase();
             autoContainer.innerHTML = '';
             if (!val) {
-                autoContainer.classList.add('d-none');
+                autoContainer.classList.add('hidden');
                 return;
             }
             var matches = allPegawai.filter(function (p) {
                 return p.NAMA && p.NAMA.toLowerCase().includes(val);
             });
             if (matches.length > 0) {
-                autoContainer.classList.remove('d-none');
+                autoContainer.classList.remove('hidden');
                 matches.slice(0, 10).forEach(function (p) {
                     var div = document.createElement('div');
                     div.className = 'autocomplete-item';
@@ -118,19 +118,19 @@ document.addEventListener('DOMContentLoaded', function () {
                         iGolongan.value = p.GOLRU || '';
                         iJabatan.value = p.JABATAN || '';
                         searchInput.value = '';
-                        autoContainer.classList.add('d-none');
+                        autoContainer.classList.add('hidden');
                     });
                     autoContainer.appendChild(div);
                 });
             } else {
-                autoContainer.classList.add('d-none');
+                autoContainer.classList.add('hidden');
             }
         });
 
         // Hide autocomplete when clicking elsewhere
         document.addEventListener('click', function (e) {
             if (e.target !== searchInput) {
-                autoContainer.classList.add('d-none');
+                autoContainer.classList.add('hidden');
             }
         });
 
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     form.reset();
                     idSurat.value = "";
                     pegawaiContainer.innerHTML = "";
-                    btnCancelEdit.classList.add('d-none');
+                    btnCancelEdit.classList.add('hidden');
                     loadLastNomor();
                     loadTableData();
                 } else {
@@ -214,17 +214,17 @@ document.addEventListener('DOMContentLoaded', function () {
         form.reset();
         idSurat.value = "";
         pegawaiContainer.innerHTML = "";
-        btnCancelEdit.classList.add('d-none');
+        btnCancelEdit.classList.add('hidden');
         loadLastNomor();
     });
 
     // Action formatter for table
     var actionFormatter = function (cell) {
-        return '<div class="d-flex gap-1 justify-content-center">'
-            + '<button class="btn btn-sm btn-warning btn-edit" title="Edit"><i class="bi bi-pencil"></i> Edit</button>'
-            + '<button class="btn btn-sm btn-success btn-generate" title="Generate Dokumen"><i class="bi bi-printer-fill"></i> Cetak</button>'
-            //+ '<button class="btn btn-sm btn-info btn-debug" title="Debug"><i class="bi bi-bug"></i></button>'
-            + '<button class="btn btn-sm btn-danger btn-delete" title="Hapus"><i class="bi bi-trash"></i> Hapus</button>'
+        return '<div class="flex gap-1 justify-center">'
+            + '<button class="btn-edit px-2 py-1 rounded bg-amber-500 text-white text-xs font-medium hover:bg-amber-600 transition"><i class="bi bi-pencil"></i> Edit</button>'
+            + '<button class="btn-generate px-2 py-1 rounded bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition"><i class="bi bi-printer-fill"></i> Cetak</button>'
+            //+ '<button class="btn-debug px-2 py-1 rounded bg-sky-500 text-white text-xs font-medium hover:bg-sky-600 transition"><i class="bi bi-bug"></i></button>'
+            + '<button class="btn-delete px-2 py-1 rounded bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition"><i class="bi bi-trash"></i> Hapus</button>'
             + '</div>';
     };
 
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             d.pegawai.forEach(function (p) { createPegawaiRow(p); });
                         }
 
-                        btnCancelEdit.classList.remove('d-none');
+                        btnCancelEdit.classList.remove('hidden');
                         window.scrollTo(0, 0);
                     }
                 });

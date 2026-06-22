@@ -6,151 +6,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surat Tugas - Kemenag Metro</title>
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_simple.min.css" rel="stylesheet">
 
-    <!-- Tabulator CSS -->
-    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="../style.css">
-    
-    <style>
-        .pegawai-row {
-            border: 1px solid #dee2e6;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-            position: relative;
-        }
-        .btn-remove-row {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-        .autocomplete-results {
-            position: absolute;
-            z-index: 1000;
-            background: white;
-            border: 1px solid #ccc;
-            max-height: 200px;
-            overflow-y: auto;
-            width: calc(100% - 30px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .autocomplete-item {
-            padding: 8px;
-            cursor: pointer;
-        }
-        .autocomplete-item:hover {
-            background-color: #f0f0f0;
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-kemenag: #006b3f;
+            --color-kemenag-dark: #004d2d;
+            --color-kemenag-light: #28a745;
         }
     </style>
+    <link rel="stylesheet" href="../style.css">
 </head>
 
-<body>
+<body class="bg-gray-50 min-h-screen">
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg kemenag-header navbar-dark mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="../index.html">
-                <img src="../assets/Kementerian_Agama_new_logo.png" alt="Logo Kemenag" style="height: 40px; margin-right: 10px;">
-                <i class="bi bi-arrow-left-circle me-2"></i>
-                Kembali
-            </a>
-            <span class="navbar-text text-white fw-bold">
-                Buat Surat Tugas
-            </span>
+    <nav class="bg-gradient-to-r from-kemenag to-kemenag-dark shadow-lg mb-6">
+        <div class="max-w-full mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between h-14">
+                <a href="../index.html" class="flex items-center gap-2 text-white font-semibold no-underline hover:text-green-200 transition-colors">
+                    <img src="../assets/Kementerian_Agama_new_logo.png" alt="Logo" class="h-8">
+                    <i class="bi bi-arrow-left-circle"></i>
+                    <span>Kembali</span>
+                </a>
+                <span class="text-white font-bold text-sm sm:text-base">Buat Surat Tugas</span>
+            </div>
         </div>
     </nav>
 
-    <div class="container-fluid px-4">
-        <div class="row">
+    <div class="max-w-full mx-auto px-4 sm:px-6">
+        <div class="flex flex-col lg:flex-row gap-6">
             <!-- Form Section -->
-            <div class="col-lg-5 mb-4">
-                <div class="card card-form">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <div><i class="bi bi-file-earmark-text me-2"></i>Form Surat Tugas</div>
-                        <button class="btn btn-sm btn-outline-secondary d-none" id="btn-cancel-edit">Batal Edit</button>
+            <div class="lg:w-[440px] shrink-0">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                    <div class="px-5 py-3 border-b-2 border-kemenag bg-gray-50 flex justify-between items-center">
+                        <h2 class="text-sm font-bold text-kemenag-dark flex items-center gap-2">
+                            <i class="bi bi-file-earmark-text"></i>Form Surat Tugas
+                        </h2>
+                        <button id="btn-cancel-edit" class="hidden px-3 py-1 rounded-lg bg-gray-200 text-gray-700 text-xs font-medium hover:bg-gray-300 transition">Batal Edit</button>
                     </div>
-                    <div class="card-body">
+                    <div class="p-5">
                         <form id="formSuratTugas">
                             <input type="hidden" id="id_surat">
-                            
+
                             <!-- Section 1 -->
-                            <h6 class="fw-bold text-success border-bottom pb-2 mb-3">1. Data Surat Tugas</h6>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Nomor Surat</label>
-                                    <input type="text" class="form-control" id="surat_nomor" placeholder="Loading..." required>
+                            <h3 class="text-sm font-bold text-kemenag border-b border-green-200 pb-2 mb-3">1. Data Surat Tugas</h3>
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Surat</label>
+                                    <input type="text" id="surat_nomor" placeholder="Loading..." required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Tanggal Surat</label>
-                                    <input type="date" class="form-control" id="surat_tanggal" required>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Surat</label>
+                                    <input type="date" id="surat_tanggal" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
                             </div>
 
                             <!-- Section 2 -->
-                            <h6 class="fw-bold text-success border-bottom pb-2 mb-3 mt-4">2. Dasar Surat Tugas</h6>
+                            <h3 class="text-sm font-bold text-kemenag border-b border-green-200 pb-2 mb-3 mt-5">2. Dasar Surat Tugas</h3>
                             <div class="mb-3">
-                                <label class="form-label">Pengirim Dasar Surat</label>
-                                <input type="text" class="form-control" id="dasar_pengirim" required>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Pengirim Dasar Surat</label>
+                                <input type="text" id="dasar_pengirim" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                             </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Nomor Dasar Surat</label>
-                                    <input type="text" class="form-control" id="dasar_nomor" required>
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Dasar Surat</label>
+                                    <input type="text" id="dasar_nomor" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Tanggal Dasar Surat</label>
-                                    <input type="date" class="form-control" id="dasar_tanggal" required>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Dasar Surat</label>
+                                    <input type="date" id="dasar_tanggal" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Perihal Dasar Surat</label>
-                                <textarea class="form-control" id="dasar_perihal" rows="2" required></textarea>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Perihal Dasar Surat</label>
+                                <textarea id="dasar_perihal" rows="2" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition"></textarea>
                             </div>
 
                             <!-- Section 3 -->
-                            <h6 class="fw-bold text-success border-bottom pb-2 mb-3 mt-4">3. Detail Kegiatan</h6>
+                            <h3 class="text-sm font-bold text-kemenag border-b border-green-200 pb-2 mb-3 mt-5">3. Detail Kegiatan</h3>
                             <div class="mb-3">
-                                <label class="form-label">Nama Kegiatan</label>
-                                <input type="text" class="form-control" id="kegiatan_nama" required>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Kegiatan</label>
+                                <input type="text" id="kegiatan_nama" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                             </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Hari/Tanggal Kegiatan</label>
-                                    <input type="date" class="form-control" id="kegiatan_haritanggal" required>
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Hari/Tanggal</label>
+                                    <input type="date" id="kegiatan_haritanggal" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Waktu (Jam)</label>
-                                    <input type="time" class="form-control" id="kegiatan_waktu" required>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Waktu (Jam)</label>
+                                    <input type="time" id="kegiatan_waktu" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Tempat Kegiatan</label>
-                                <input type="text" class="form-control" id="kegiatan_tempat" required>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tempat Kegiatan</label>
+                                <input type="text" id="kegiatan_tempat" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                             </div>
 
                             <!-- Section 4 -->
-                            <h6 class="fw-bold text-success border-bottom pb-2 mb-3 mt-4 d-flex justify-content-between align-items-center">
-                                <span>4. Pegawai yang Ditugaskan</span>
-                                <button type="button" class="btn btn-sm btn-primary" id="btn-tambah-pegawai"><i class="bi bi-plus"></i> Tambah</button>
-                            </h6>
+                            <div class="flex justify-between items-center border-b border-green-200 pb-2 mb-3 mt-5">
+                                <h3 class="text-sm font-bold text-kemenag">4. Pegawai yang Ditugaskan</h3>
+                                <button type="button" id="btn-tambah-pegawai" class="px-3 py-1 rounded-lg bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition flex items-center gap-1">
+                                    <i class="bi bi-plus"></i> Tambah
+                                </button>
+                            </div>
                             <div id="pegawai-container">
                                 <!-- Dynamic rows go here -->
                             </div>
 
-                            <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-kemenag btn-lg" id="btn-submit">
-                                    <i class="bi bi-save me-2"></i>Simpan Surat Tugas
+                            <div class="mt-5">
+                                <button type="submit" id="btn-submit" class="w-full py-2.5 rounded-lg bg-kemenag text-white font-semibold text-sm hover:bg-kemenag-dark transition-colors flex items-center justify-center gap-2">
+                                    <i class="bi bi-save"></i>Simpan Surat Tugas
                                 </button>
                             </div>
                         </form>
@@ -159,13 +129,15 @@
             </div>
 
             <!-- Table Section -->
-            <div class="col-lg-7">
-                <div class="card card-form h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div><i class="bi bi-table me-2"></i>Daftar Surat Tugas</div>
-                        <input type="text" id="global-search" class="form-control form-control-sm w-auto" placeholder="Cari data...">
+            <div class="flex-1 min-w-0">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 h-full">
+                    <div class="px-5 py-3 border-b-2 border-kemenag bg-gray-50 flex justify-between items-center flex-wrap gap-2">
+                        <h2 class="text-sm font-bold text-kemenag-dark flex items-center gap-2">
+                            <i class="bi bi-table"></i>Daftar Surat Tugas
+                        </h2>
+                        <input type="text" id="global-search" placeholder="Cari data..." class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition w-40">
                     </div>
-                    <div class="card-body p-0">
+                    <div class="overflow-x-auto">
                         <div id="table-surat-tugas"></div>
                     </div>
                 </div>
@@ -173,11 +145,7 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
-
-    <!-- Page Logic -->
     <script src="surat_tugas.js"></script>
 </body>
 

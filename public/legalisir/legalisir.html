@@ -6,78 +6,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Legalisir - Kemenag Metro</title>
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_simple.min.css" rel="stylesheet">
 
-    <!-- Tabulator CSS -->
-    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-kemenag: #006b3f;
+            --color-kemenag-dark: #004d2d;
+            --color-kemenag-light: #28a745;
+        }
+    </style>
     <link rel="stylesheet" href="../style.css">
 </head>
 
-<body>
+<body class="bg-gray-50 min-h-screen">
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg kemenag-header navbar-dark mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="../index.html">
-                <img src="../assets/Kementerian_Agama_new_logo.png" alt="Logo Kemenag" style="height: 40px; margin-right: 10px;">
-                <i class="bi bi-arrow-left-circle me-2"></i>
-                Kembali
-            </a>
-            <span class="navbar-text text-white fw-bold">
-                Pencatatan Legalisir
-            </span>
+    <nav class="bg-gradient-to-r from-kemenag to-kemenag-dark shadow-lg mb-6">
+        <div class="max-w-full mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between h-14">
+                <a href="../index.html" class="flex items-center gap-2 text-white font-semibold no-underline hover:text-green-200 transition-colors">
+                    <img src="../assets/Kementerian_Agama_new_logo.png" alt="Logo" class="h-8">
+                    <i class="bi bi-arrow-left-circle"></i>
+                    <span>Kembali</span>
+                </a>
+                <span class="text-white font-bold text-sm sm:text-base">Pencatatan Legalisir</span>
+            </div>
         </div>
     </nav>
 
-    <div class="container-fluid px-4">
-        <div class="row">
+    <div class="max-w-full mx-auto px-4 sm:px-6">
+        <div class="flex flex-col lg:flex-row gap-6">
             <!-- Form Section -->
-            <div class="col-lg-4">
-                <div class="card card-form">
-                    <div class="card-header">
-                        <i class="bi bi-plus-circle me-2"></i>Tambah Data Legalisir
+            <div class="lg:w-[380px] shrink-0">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                    <div class="px-5 py-3 border-b-2 border-kemenag bg-gray-50">
+                        <h2 class="text-sm font-bold text-kemenag-dark flex items-center gap-2">
+                            <i class="bi bi-plus-circle"></i>Tambah Data Legalisir
+                        </h2>
                     </div>
-                    <div class="card-body">
+                    <div class="p-5">
                         <form id="formLegalisir">
                             <input type="hidden" id="id_legalisir">
-                            <div class="mb-3">
-                                <label for="nomor_urut" class="form-label">Nomor Urut</label>
-                                <input type="number" class="form-control" id="nomor_urut" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="tanggal_surat" class="form-label">Tanggal Surat</label>
-                                <input type="date" class="form-control" id="tanggal_surat" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="nomor_legalisir" class="form-label">Nomor Legalisir</label>
-                                <input type="text" class="form-control" id="nomor_legalisir" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="nama_nip" class="form-label">Nama / NIP</label>
-                                <input type="text" class="form-control" id="nama_nip" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="yang_menandatangani" class="form-label">Yang Menandatangani</label>
-                                <input type="text" class="form-control" id="yang_menandatangani" required>
+                            <div class="mb-4">
+                                <label for="nomor_urut" class="block text-sm font-medium text-gray-700 mb-1">Nomor Urut</label>
+                                <input type="number" id="nomor_urut" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                             </div>
                             <div class="mb-4">
-                                <label for="keterangan" class="form-label">Keterangan</label>
-                                <input type="text" class="form-control" id="keterangan">
+                                <label for="tanggal_surat" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Surat</label>
+                                <input type="date" id="tanggal_surat" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
                             </div>
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-kemenag btn-lg" id="btn-submit">
-                                    <i class="bi bi-save me-2"></i>Simpan Data
+                            <div class="mb-4">
+                                <label for="nomor_legalisir" class="block text-sm font-medium text-gray-700 mb-1">Nomor Legalisir</label>
+                                <input type="text" id="nomor_legalisir" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
+                            </div>
+                            <div class="mb-4">
+                                <label for="nama_nip" class="block text-sm font-medium text-gray-700 mb-1">Nama / NIP</label>
+                                <input type="text" id="nama_nip" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
+                            </div>
+                            <div class="mb-4">
+                                <label for="yang_menandatangani" class="block text-sm font-medium text-gray-700 mb-1">Yang Menandatangani</label>
+                                <input type="text" id="yang_menandatangani" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
+                            </div>
+                            <div class="mb-5">
+                                <label for="keterangan" class="block text-sm font-medium text-gray-700 mb-1">Keterangan</label>
+                                <input type="text" id="keterangan" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition">
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <button type="submit" id="btn-submit" class="btn-kemenag w-full py-2.5 rounded-lg bg-kemenag text-white font-semibold text-sm hover:bg-kemenag-dark transition-colors flex items-center justify-center gap-2">
+                                    <i class="bi bi-save"></i>Simpan Data
                                 </button>
-                                <button type="button" class="btn btn-secondary d-none" id="btn-cancel-edit">
+                                <button type="button" id="btn-cancel-edit" class="hidden w-full py-2 rounded-lg bg-gray-500 text-white font-medium text-sm hover:bg-gray-600 transition-colors">
                                     Batal Edit
                                 </button>
                             </div>
@@ -87,20 +88,19 @@
             </div>
 
             <!-- Table Section -->
-            <div class="col-lg-8">
-                <div class="card card-form h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div><i class="bi bi-table me-2"></i>Data Legalisir</div>
-                        <div class="d-flex gap-2 align-items-center">
-                            <input type="text" id="global-search" class="form-control form-control-sm"
-                                placeholder="Cari data...">
-                            <button id="download-pdf" class="btn btn-sm btn-outline-danger text-nowrap">Export
-                                PDF</button>
-                            <button id="download-xlsx" class="btn btn-sm btn-outline-primary text-nowrap">Export
-                                Excel</button>
+            <div class="flex-1 min-w-0">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 h-full">
+                    <div class="px-5 py-3 border-b-2 border-kemenag bg-gray-50 flex justify-between items-center flex-wrap gap-2">
+                        <h2 class="text-sm font-bold text-kemenag-dark flex items-center gap-2">
+                            <i class="bi bi-table"></i>Data Legalisir
+                        </h2>
+                        <div class="flex gap-2 items-center flex-wrap">
+                            <input type="text" id="global-search" placeholder="Cari data..." class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-kemenag/40 focus:border-kemenag outline-none transition w-40">
+                            <button id="download-pdf" class="px-3 py-1.5 rounded-lg border border-red-300 text-red-600 text-xs font-medium hover:bg-red-50 transition whitespace-nowrap">Export PDF</button>
+                            <button id="download-xlsx" class="px-3 py-1.5 rounded-lg border border-blue-300 text-blue-600 text-xs font-medium hover:bg-blue-50 transition whitespace-nowrap">Export Excel</button>
                         </div>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="overflow-x-auto">
                         <div id="table-legalisir"></div>
                     </div>
                 </div>
@@ -108,17 +108,10 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Tabulator JS -->
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
-    <!-- SheetJS for Excel Export -->
     <script type="text/javascript" src="https://oss.sheetjs.com/sheetjs/xlsx.full.min.js"></script>
-    <!-- jsPDF and AutoTable for PDF Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
-    <!-- Page Logic -->
     <script src="legalisir.js"></script>
 </body>
 
