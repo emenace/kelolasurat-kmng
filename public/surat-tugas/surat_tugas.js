@@ -232,15 +232,15 @@ document.addEventListener('DOMContentLoaded', function () {
     table = new Tabulator("#table-surat-tugas", {
         layout: "fitData",
         pagination: "local",
-        paginationSize: 10,
+        paginationSize: 25,
         placeholder: "Tidak ada data",
         columns: [
             //{ title: "No", formatter: "rownum", hozAlign: "center", width: 60, headerSort: false },
             { title: "Nomor Surat", field: "surat_nomor", sorter: "string", minWidth: 120 },
-            { title: "Aksi", formatter: actionFormatter, hozAlign: "center", width: 280, headerSort: false },
             { title: "Nama Kegiatan", field: "kegiatan_nama", sorter: "string", minWidth: 200 },
             { title: "Tgl Kegiatan", field: "kegiatan_haritanggal", sorter: "string", minWidth: 120 },
-            { title: "Jml Pegawai", field: "pegawai_jumlah", hozAlign: "center", minWidth: 100 }
+            { title: "Jml Pegawai", field: "pegawai_jumlah", hozAlign: "center", minWidth: 100 },
+            { title: "Aksi", formatter: actionFormatter, hozAlign: "center", width: 280, headerSort: false },
         ],
         locale: "id",
         langs: {

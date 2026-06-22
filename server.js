@@ -162,6 +162,8 @@ app.post('/api/verify-key', (req, res) => {
 // Add new pegawai
 app.post('/api/pegawai', (req, res) => {
     const d = req.body;
+    // Auto-sync FORMATTED NIP from NIP BARU
+    d["FORMATTED NIP"] = d["NIP BARU"] || '';
     dbPegawai.run(
         `INSERT INTO DataPegawai ("NO","NAMA","NIP LAMA","NIP BARU","FORMATTED NIP","GOLRU","PANGKAT","TMT GOLRU","SATKER","JABATAN","TMT JABATAN","THN","BLN","PENDIDIKAN TERAKHIR","THN PENDIDIKAN","JENIS PENDIDIKAN","TGL LAHIR","TMT PENSIUN","KET")
          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
@@ -177,6 +179,8 @@ app.post('/api/pegawai', (req, res) => {
 app.put('/api/pegawai/:no', (req, res) => {
     const d = req.body;
     const no = req.params.no;
+    // Auto-sync FORMATTED NIP from NIP BARU
+    d["FORMATTED NIP"] = d["NIP BARU"] || '';
     dbPegawai.run(
         `UPDATE DataPegawai SET "NAMA"=?,"NIP LAMA"=?,"NIP BARU"=?,"FORMATTED NIP"=?,"GOLRU"=?,"PANGKAT"=?,"TMT GOLRU"=?,"SATKER"=?,"JABATAN"=?,"TMT JABATAN"=?,"THN"=?,"BLN"=?,"PENDIDIKAN TERAKHIR"=?,"THN PENDIDIKAN"=?,"JENIS PENDIDIKAN"=?,"TGL LAHIR"=?,"TMT PENSIUN"=?,"KET"=? WHERE "NO"=?`,
         [d["NAMA"], d["NIP LAMA"], d["NIP BARU"], d["FORMATTED NIP"], d["GOLRU"], d["PANGKAT"], d["TMT GOLRU"], d["SATKER"], d["JABATAN"], d["TMT JABATAN"], d["THN"], d["BLN"], d["PENDIDIKAN TERAKHIR"], d["THN PENDIDIKAN"], d["JENIS PENDIDIKAN"], d["TGL LAHIR"], d["TMT PENSIUN"], d["KET"], no],

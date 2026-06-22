@@ -4,25 +4,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // All columns definition with their labels
     const FIELDS = [
-        { field: "NO",                label: "No"                },
-        { field: "NAMA",              label: "Nama"              },
-        { field: "NIP LAMA",          label: "NIP Lama"          },
-        { field: "NIP BARU",          label: "NIP Baru"          },
-        { field: "FORMATTED NIP",     label: "Formatted NIP"     },
-        { field: "GOLRU",             label: "Gol/Ruang"         },
-        { field: "PANGKAT",           label: "Pangkat"           },
-        { field: "TMT GOLRU",         label: "TMT Gol/Ruang"     },
-        { field: "SATKER",            label: "Satuan Kerja"      },
-        { field: "JABATAN",           label: "Jabatan"           },
-        { field: "TMT JABATAN",       label: "TMT Jabatan"       },
-        { field: "THN",               label: "Masa Kerja Thn"    },
-        { field: "BLN",               label: "Masa Kerja Bln"    },
-        { field: "PENDIDIKAN TERAKHIR", label: "Pendidikan"      },
-        { field: "THN PENDIDIKAN",    label: "Thn Pendidikan"    },
-        { field: "JENIS PENDIDIKAN",  label: "Jenis Pendidikan"  },
-        { field: "TGL LAHIR",         label: "Tgl Lahir"         },
-        { field: "TMT PENSIUN",       label: "TMT Pensiun"       },
-        { field: "KET",               label: "Keterangan"        }
+        { field: "NO", label: "No" },
+        { field: "NAMA", label: "Nama" },
+        { field: "NIP LAMA", label: "NIP Lama" },
+        { field: "NIP BARU", label: "NIP Baru" },
+        { field: "FORMATTED NIP", label: "Formatted NIP" },
+        { field: "GOLRU", label: "Gol/Ruang" },
+        { field: "PANGKAT", label: "Pangkat" },
+        { field: "TMT GOLRU", label: "TMT Gol/Ruang" },
+        { field: "SATKER", label: "Satuan Kerja" },
+        { field: "JABATAN", label: "Jabatan" },
+        { field: "TMT JABATAN", label: "TMT Jabatan" },
+        { field: "THN", label: "Masa Kerja Thn" },
+        { field: "BLN", label: "Masa Kerja Bln" },
+        { field: "PENDIDIKAN TERAKHIR", label: "Pendidikan" },
+        { field: "THN PENDIDIKAN", label: "Thn Pendidikan" },
+        { field: "JENIS PENDIDIKAN", label: "Jenis Pendidikan" },
+        { field: "TGL LAHIR", label: "Tgl Lahir" },
+        { field: "TMT PENSIUN", label: "TMT Pensiun" },
+        { field: "KET", label: "Keterangan" }
     ];
 
     // Columns shown in VIEW mode
@@ -71,6 +71,8 @@ document.addEventListener('DOMContentLoaded', function () {
         ];
 
         FIELDS.forEach(def => {
+            // Hide FORMATTED NIP from the edit table - it's auto-synced from NIP BARU
+            if (def.field === "FORMATTED NIP") return;
             cols.push({ title: def.label, field: def.field, sorter: "string", minWidth: 120 });
         });
 
@@ -87,8 +89,8 @@ document.addEventListener('DOMContentLoaded', function () {
             data: data,
             layout: "fitData",
             pagination: "local",
-            paginationSize: 10,
-            paginationSizeSelector: [10, 25, 50, 100, true],
+            paginationSize: 25,
+            paginationSizeSelector: [25, 50, 100, true],
             placeholder: "Tidak ada data",
             columns: buildViewColumns(),
             locale: "id",
@@ -172,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    document.getElementById('btn-submit-key').addEventListener('click', function() {
+    document.getElementById('btn-submit-key').addEventListener('click', function () {
         const key = document.getElementById('input-pass-key').value;
         const errorEl = document.getElementById('verify-key-error');
 
@@ -181,21 +183,21 @@ document.addEventListener('DOMContentLoaded', function () {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ key })
         })
-        .then(r => r.json())
-        .then(res => {
-            if(res.message === 'success') {
-                errorEl.classList.add('hidden');
-                hideModal('verifyKeyModal');
-                enterEditMode();
-            } else {
+            .then(r => r.json())
+            .then(res => {
+                if (res.message === 'success') {
+                    errorEl.classList.add('hidden');
+                    hideModal('verifyKeyModal');
+                    enterEditMode();
+                } else {
+                    errorEl.classList.remove('hidden');
+                    errorEl.textContent = res.error || "Kode kunci tidak sesuai, perubahan tidak diperbolehkan";
+                }
+            })
+            .catch(err => {
                 errorEl.classList.remove('hidden');
-                errorEl.textContent = res.error || "Kode kunci tidak sesuai, perubahan tidak diperbolehkan";
-            }
-        })
-        .catch(err => {
-            errorEl.classList.remove('hidden');
-            errorEl.textContent = "Terjadi kesalahan sistem";
-        });
+                errorEl.textContent = "Terjadi kesalahan sistem";
+            });
     });
 
     // ----- Tambah Data button -----
@@ -239,6 +241,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const el = document.getElementById('edit-field-' + def.field.replace(/\s+/g, '_'));
             if (el) payload[def.field] = el.value;
         });
+        // Auto-sync FORMATTED NIP from NIP BARU
+        payload["FORMATTED NIP"] = payload["NIP BARU"] || '';
 
         fetch('/api/pegawai/' + encodeURIComponent(no), {
             method: 'PUT',
@@ -268,6 +272,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const el = document.getElementById('add-field-' + def.field.replace(/\s+/g, '_'));
             if (el) payload[def.field] = el.value;
         });
+        // Auto-sync FORMATTED NIP from NIP BARU
+        payload["FORMATTED NIP"] = payload["NIP BARU"] || '';
 
         fetch('/api/pegawai', {
             method: 'POST',

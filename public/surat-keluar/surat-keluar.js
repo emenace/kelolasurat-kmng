@@ -3,12 +3,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('tanggal_surat').valueAsDate = new Date();
 
     // Auto-fill nomor surat based on nomor urut
-    document.getElementById('nomor_urut').addEventListener('input', function() {
+    document.getElementById('nomor_urut').addEventListener('input', function () {
         document.getElementById('nomor_surat').value = `B-${this.value}`;
     });
 
     // Auto-fill Keterangan based on checkbox
-    document.getElementById('keterangan_manual').addEventListener('change', function() {
+    document.getElementById('keterangan_manual').addEventListener('change', function () {
         if (this.checked) {
             document.getElementById('keterangan').value = "Input Manual";
         } else {
@@ -43,13 +43,19 @@ document.addEventListener('DOMContentLoaded', function () {
             return response.data;
         },
         pagination: "local",
-        paginationSize: 10,
-        paginationSizeSelector: [10, 50, 100, true], // Add pagination size selector
+        paginationSize: 25,
+        paginationSizeSelector: [25, 50, 100, true], // Add pagination size selector
         movableColumns: false,
         columns: [
-            { title: "Nomor Urut", field: "nomor_urut", headerFilter: "input", width: 120 },
+            { title: "No", field: "nomor_urut", headerFilter: "input", width: 60 },
+            { title: "Tanggal", field: "tanggal_surat", headerFilter: "input", width: 120 },
+            { title: "Nomor Surat", field: "nomor_surat", headerFilter: "input", width: 150 },
+            { title: "Asal Surat", field: "asal_surat", headerFilter: "input" },
+            { title: "Tujuan", field: "tujuan", headerFilter: "input" },
+            { title: "Isi Surat", field: "isi_surat", headerFilter: "input" },
+            { title: "Keterangan", field: "keterangan", headerFilter: "input" },
             {
-                title: "Aksi", formatter: actionFormatter, hozAlign: "center", headerSort: false, cellClick: function (e, cell) {
+                title: "Aksi", formatter: actionFormatter, width: 150, hozAlign: "center", headerSort: false, cellClick: function (e, cell) {
                     var id = cell.getRow().getData().id;
                     var target = e.target.closest('button');
                     if (target && target.classList.contains('btn-edit')) {
@@ -59,12 +65,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             },
-            { title: "Tanggal", field: "tanggal_surat", headerFilter: "input", width: 120 },
-            { title: "Nomor Surat", field: "nomor_surat", headerFilter: "input", width: 150 },
-            { title: "Asal Surat", field: "asal_surat", headerFilter: "input" },
-            { title: "Tujuan", field: "tujuan", headerFilter: "input" },
-            { title: "Isi Surat", field: "isi_surat", headerFilter: "input" },
-            { title: "Keterangan", field: "keterangan", headerFilter: "input" },
 
         ],
     });

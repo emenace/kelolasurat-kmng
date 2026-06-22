@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var cutiTanggalmanual = document.getElementById('cuti_tanggalmanual');
 
     if (checkManualTanggal) {
-        checkManualTanggal.addEventListener('change', function() {
+        checkManualTanggal.addEventListener('change', function () {
             if (this.checked) {
                 datePickerContainer.classList.add('hidden');
                 manualDateContainer.classList.remove('hidden');
@@ -285,16 +285,16 @@ document.addEventListener('DOMContentLoaded', function () {
     table = new Tabulator("#table-sk-cuti", {
         layout: "fitData",
         pagination: "local",
-        paginationSize: 10,
+        paginationSize: 25,
         placeholder: "Tidak ada data",
         columns: [
             { title: "No. SK", field: "cuti_nomor", sorter: "string", minWidth: 80 },
-            { title: "Aksi", formatter: actionFormatter, hozAlign: "center", width: 380, headerSort: false },
             { title: "Nama Pegawai", field: "pegawai_nama", sorter: "string", minWidth: 180 },
             { title: "Tgl Cuti", field: "cuti_startdate", sorter: "string", minWidth: 110 },
             { title: "s.d", field: "cuti_enddate", sorter: "string", minWidth: 110 },
             { title: "Lama", field: "cuti_daylong", hozAlign: "center", minWidth: 70 },
-            { title: "Alasan", field: "cuti_alasan", sorter: "string", minWidth: 150 }
+            { title: "Alasan", field: "cuti_alasan", sorter: "string", minWidth: 150 },
+            { title: "Aksi", formatter: actionFormatter, hozAlign: "center", width: 300, headerSort: false },
         ],
         locale: "id",
         langs: {
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         cutiStartdate.value = d.cuti_startdate || '';
                         cutiEnddate.value = d.cuti_enddate || '';
                         cutiDaylong.value = d.cuti_daylong || '';
-                        
+
                         if (d.cuti_tanggalmanual) {
                             checkManualTanggal.checked = true;
                             cutiTanggalmanual.value = d.cuti_tanggalmanual;
