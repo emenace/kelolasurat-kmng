@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
         FIELDS.forEach(def => {
             // Hide FORMATTED NIP from the edit table - it's auto-synced from NIP BARU
             if (def.field === "FORMATTED NIP") return;
-            cols.push({ title: def.label, field: def.field, sorter: "string", minWidth: 120 });
+            cols.push({ title: def.label, field: def.field, sorter: "string", minWidth: 140 });
         });
 
         return cols;
@@ -108,12 +108,37 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function populateSatkerFilter(data) {
+        const select = document.getElementById('filter-satker');
+        if (!select) return;
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">Semua Satker</option>';
+
+        const satkers = new Set();
+        data.forEach(row => {
+            if (row['SATKER']) satkers.add(row['SATKER'].trim());
+        });
+
+        const sorted = Array.from(satkers).sort();
+        sorted.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            select.appendChild(opt);
+        });
+
+        if (currentVal && sorted.includes(currentVal)) {
+            select.value = currentVal;
+        }
+    }
+
     // ----- Load data from API -----
     function loadData(callback) {
         fetch('/api/pegawai')
             .then(r => r.json())
             .then(data => {
                 if (data.message === "success") {
+                    populateSatkerFilter(data.data);
                     if (callback) callback(data.data);
                     else initTable(data.data);
                 } else {
@@ -291,21 +316,29 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    // ----- Global Search -----
-    document.getElementById("global-search").addEventListener("input", function () {
-        const term = this.value;
-        if (table) {
-            if (term === "") {
-                table.clearFilter();
-            } else {
-                table.setFilter(function (data) {
-                    const matchName = data["NAMA"] && data["NAMA"].toLowerCase().includes(term.toLowerCase());
-                    const matchJabatan = data["JABATAN"] && data["JABATAN"].toLowerCase().includes(term.toLowerCase());
-                    return matchName || matchJabatan;
-                });
-            }
+    // ----- Filters -----
+    function applyFilters() {
+        if (!table) return;
+        const term = document.getElementById("global-search").value.toLowerCase();
+        const satker = document.getElementById("filter-satker").value;
+
+        if (term === "" && satker === "") {
+            table.clearFilter();
+        } else {
+            table.setFilter(function (data) {
+                const matchName = data["NAMA"] && data["NAMA"].toLowerCase().includes(term);
+                const matchJabatan = data["JABATAN"] && data["JABATAN"].toLowerCase().includes(term);
+                const matchText = matchName || matchJabatan;
+
+                const matchSatker = satker === "" || (data["SATKER"] && data["SATKER"].trim() === satker);
+
+                return (!term || matchText) && matchSatker;
+            });
         }
-    });
+    }
+
+    document.getElementById("global-search").addEventListener("input", applyFilters);
+    document.getElementById("filter-satker").addEventListener("change", applyFilters);
 
     // ----- Export PDF -----
     document.getElementById("download-pdf").addEventListener("click", function () {
