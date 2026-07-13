@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ----- Build columns for VIEW mode -----
     function buildViewColumns() {
         const cols = [
-            { title: "No", formatter: "rownum", hozAlign: "center", width: 55, headerSort: false }
+            { title: "No", field: "NO", hozAlign: "center", width: 55, sorter: "number" }
         ];
         VIEW_FIELDS.forEach(f => {
             const def = FIELDS.find(x => x.field === f);
@@ -66,8 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         const cols = [
-            actionCol,
-            { title: "No", formatter: "rownum", hozAlign: "center", width: 55, headerSort: false }
+            actionCol
         ];
 
         FIELDS.forEach(def => {
@@ -155,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('btn-update-data').classList.replace('bg-amber-500', 'bg-gray-500');
         document.getElementById('btn-update-data').classList.replace('hover:bg-amber-600', 'hover:bg-gray-600');
         document.getElementById('btn-tambah-data').classList.remove('hidden');
+        document.getElementById('btn-import-csv').classList.remove('hidden');
 
         loadData(function (data) {
             if (table) { table.destroy(); table = null; }
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 data: data,
                 layout: "fitData",
                 pagination: "local",
-                paginationSize: 10,
+                paginationSize: 25,
                 paginationSizeSelector: [10, 25, 50, 100, true],
                 placeholder: "Tidak ada data",
                 columns: buildEditColumns(),
@@ -185,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('btn-update-data').classList.replace('bg-gray-500', 'bg-amber-500');
         document.getElementById('btn-update-data').classList.replace('hover:bg-gray-600', 'hover:bg-amber-600');
         document.getElementById('btn-tambah-data').classList.add('hidden');
+        document.getElementById('btn-import-csv').classList.add('hidden');
         loadData(function (data) { initTable(data); });
     }
 
@@ -314,6 +315,69 @@ document.addEventListener('DOMContentLoaded', function () {
                     alert('Gagal menambah data: ' + res.error);
                 }
             });
+    });
+
+    // ----- Import CSV -----
+    document.getElementById('btn-import-csv').addEventListener('click', function () {
+        document.getElementById('input-csv-file').value = '';
+        const statusEl = document.getElementById('import-csv-status');
+        statusEl.classList.add('hidden');
+        statusEl.textContent = '';
+        showModal('importCsvModal');
+    });
+
+    document.getElementById('btn-submit-import-csv').addEventListener('click', function () {
+        const fileInput = document.getElementById('input-csv-file');
+        const file = fileInput.files[0];
+        const statusEl = document.getElementById('import-csv-status');
+
+        if (!file) {
+            statusEl.textContent = 'Silakan pilih file CSV terlebih dahulu.';
+            statusEl.className = 'text-sm p-3 rounded-lg mb-2 bg-red-50 text-red-600 border border-red-200 block';
+            return;
+        }
+
+        const btnSubmit = document.getElementById('btn-submit-import-csv');
+        const originalText = btnSubmit.innerHTML;
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="bi bi-hourglass-split animate-spin"></i> Mengimpor...';
+
+        statusEl.textContent = 'Sedang memproses dan mengunggah data...';
+        statusEl.className = 'text-sm p-3 rounded-lg mb-2 bg-blue-50 text-blue-600 border border-blue-200 block';
+
+        const formData = new FormData();
+        formData.append('csvFile', file);
+
+        fetch('/api/pegawai/import-csv', {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(res => {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = originalText;
+
+            if (res.message === 'success') {
+                statusEl.textContent = `Berhasil! ${res.inserted} baris diimpor. Backup db: ${res.backupFile}`;
+                statusEl.className = 'text-sm p-3 rounded-lg mb-2 bg-emerald-50 text-emerald-600 border border-emerald-200 block';
+                
+                // Refresh data in table
+                loadData(function (data) { table.setData(data); });
+                
+                setTimeout(() => {
+                    hideModal('importCsvModal');
+                }, 2000);
+            } else {
+                statusEl.textContent = 'Gagal: ' + (res.error || 'Terjadi kesalahan');
+                statusEl.className = 'text-sm p-3 rounded-lg mb-2 bg-red-50 text-red-600 border border-red-200 block';
+            }
+        })
+        .catch(err => {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = originalText;
+            statusEl.textContent = 'Terjadi kesalahan jaringan atau server.';
+            statusEl.className = 'text-sm p-3 rounded-lg mb-2 bg-red-50 text-red-600 border border-red-200 block';
+        });
     });
 
     // ----- Filters -----

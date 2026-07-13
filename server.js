@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 
 const db = require('./database/logic/database');
 const dbPegawai = require('./database/logic/database_pegawai');
@@ -197,6 +199,136 @@ app.delete('/api/pegawai/:no', (req, res) => {
         if (err) return res.status(400).json({ "error": err.message });
         res.json({ "message": "success" });
     });
+});
+
+// Import CSV DataPegawai with automatic backup
+app.post('/api/pegawai/import-csv', upload.single('csvFile'), (req, res) => {
+    if (!req.file || !req.file.buffer) {
+        return res.status(400).json({ error: 'File CSV tidak ditemukan' });
+    }
+
+    try {
+        const fileContent = req.file.buffer.toString('utf-8');
+        const normalized = fileContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+        const records = [];
+        let current = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < normalized.length; i++) {
+            const ch = normalized[i];
+            if (ch === '"') {
+                if (inQuotes && i + 1 < normalized.length && normalized[i + 1] === '"') {
+                    current += '"';
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (ch === '\n' && !inQuotes) {
+                if (current.trim() !== '') {
+                    records.push(current);
+                }
+                current = '';
+            } else {
+                current += ch;
+            }
+        }
+        if (current.trim() !== '') {
+            records.push(current);
+        }
+
+        if (records.length < 2) {
+            return res.status(400).json({ error: 'File CSV kosong atau tidak memiliki data baris' });
+        }
+
+        const headers = records[0].split(';').map(h => h.trim());
+        const rows = [];
+        for (let i = 1; i < records.length; i++) {
+            const rowData = records[i].split(';');
+            const row = {};
+            headers.forEach((header, index) => {
+                let val = rowData[index] || null;
+                if (val !== null) {
+                    val = val.trim();
+                    if (val.startsWith('"') && val.endsWith('"')) {
+                        val = val.substring(1, val.length - 1);
+                    }
+                    val = val.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+                }
+                row[header] = val;
+            });
+            rows.push(row);
+        }
+
+        if (rows.length === 0) {
+            return res.status(400).json({ error: 'Tidak ada data valid yang bisa diimpor' });
+        }
+
+        // Automatic Backup of pegawai.sqlite with format DDMMYYYY (e.g. pegawai.sqlite.13072026)
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        const backupFileName = `pegawai.sqlite.${dd}${mm}${yyyy}`;
+        const dbPath = path.resolve(__dirname, './database/data/pegawai.sqlite');
+        const backupPath = path.resolve(__dirname, `./database/data/${backupFileName}`);
+
+        if (fs.existsSync(dbPath)) {
+            fs.copyFileSync(dbPath, backupPath);
+            console.log(`Backup database pegawai berhasil dibuat: ${backupFileName}`);
+        }
+
+        dbPegawai.serialize(() => {
+            dbPegawai.run('DELETE FROM DataPegawai', (errDel) => {
+                if (errDel) {
+                    console.error('Error clearing DataPegawai:', errDel.message);
+                    return res.status(500).json({ error: errDel.message });
+                }
+
+                const stmt = dbPegawai.prepare(`INSERT INTO "DataPegawai" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+                rows.forEach(row => {
+                    const formattedNip = row['NIP BARU'] || '';
+                    const ket = row['KET.'] || row['KET'] || null;
+
+                    stmt.run([
+                        row['NO'],
+                        row['NAMA'],
+                        row['NIP LAMA'],
+                        row['NIP BARU'],
+                        formattedNip,
+                        row['GOLRU'],
+                        row['PANGKAT'],
+                        row['TMT GOLRU'],
+                        row['SATKER'],
+                        row['JABATAN'],
+                        row['TMT JABATAN'],
+                        row['THN'],
+                        row['BLN'],
+                        row['PENDIDIKAN TERAKHIR'],
+                        row['THN PENDIDIKAN'],
+                        row['JENIS PENDIDIKAN'],
+                        row['TGL LAHIR'],
+                        row['TMT PENSIUN'],
+                        ket
+                    ]);
+                });
+                stmt.finalize((errFin) => {
+                    if (errFin) {
+                        console.error('Error finalizing insert:', errFin.message);
+                        return res.status(500).json({ error: errFin.message });
+                    }
+                    res.json({
+                        message: 'success',
+                        inserted: rows.length,
+                        backupFile: backupFileName
+                    });
+                });
+            });
+        });
+    } catch (error) {
+        console.error('Import CSV error:', error);
+        res.status(500).json({ error: 'Gagal memproses file CSV: ' + error.message });
+    }
 });
 
 
