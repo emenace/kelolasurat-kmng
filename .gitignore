@@ -151,3 +151,6 @@ stampel.png
 *.png
 *.csv   
 *.xlsx
+pegawai.*
+pegawai.*.*
+data/*
