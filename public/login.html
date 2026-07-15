@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Aplikasi Layanan Kepegawaian Kemenag Metro</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-kemenag: #006b3f;
+            --color-kemenag-dark: #004d2d;
+            --color-kemenag-light: #28a745;
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-[#ecfdf5] via-[#f0fdf4] to-[#f8fafc] flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-md">
+        <!-- Top Header & Logo -->
+        <div class="flex items-center justify-center gap-3.5 mb-6">
+            <img src="assets/logo_kemenag.png" alt="Logo Kemenag" class="w-12 h-12 object-contain">
+            <div class="text-left">
+                <h1 class="text-lg sm:text-xl font-bold text-gray-900 tracking-tight leading-tight">Aplikasi Layanan Kepegawaian</h1>
+                <p class="text-xs font-medium text-gray-500 mt-0.5">Kementerian Agama Kota Metro</p>
+            </div>
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-white rounded-[24px] shadow-xl shadow-gray-200/60 border border-gray-100/80 p-7 sm:p-8">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-1.5">Masuk ke Sistem</h2>
+                <p class="text-xs text-gray-500">Masukkan kredensial untuk mengakses panel aplikasi</p>
+            </div>
+
+            <form id="login-form" autocomplete="off">
+                <div>
+                    <label for="input-username" class="block text-xs font-semibold text-gray-700 mb-1.5">
+                        Username
+                    </label>
+                    <input type="text" id="input-username" placeholder="Masukkan username" autocomplete="off"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#006b3f] focus:ring-1 focus:ring-[#006b3f] focus:bg-white transition-all">
+                </div>
+
+                <div class="mt-4">
+                    <label for="input-password" class="block text-xs font-semibold text-gray-700 mb-1.5">
+                        Password
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="input-password" placeholder="Masukkan password" autocomplete="off"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#006b3f] focus:ring-1 focus:ring-[#006b3f] focus:bg-white transition-all pr-10">
+                        <button type="button" id="toggle-password"
+                            class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
+                            <i class="bi bi-eye text-base"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="login-error"
+                    class="hidden text-xs p-3 rounded-xl bg-red-50 text-red-600 border border-red-200 mt-4 flex items-center gap-2">
+                    <i class="bi bi-exclamation-triangle-fill text-sm"></i>
+                    <span id="login-error-text">Username atau password salah</span>
+                </div>
+
+                <button type="submit" id="btn-login"
+                    class="w-full mt-6 py-2.5 px-4 rounded-xl bg-[#006b3f] hover:bg-[#005733] active:bg-[#004227] text-white font-semibold text-sm transition-all shadow-sm shadow-[#006b3f]/20 flex items-center justify-center gap-2 cursor-pointer">
+                    Masuk
+                </button>
+            </form>
+        </div>
+
+        <p class="text-center text-gray-400 text-xs mt-6">&copy; 2026 Kementerian Agama Kota Metro</p>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        document.getElementById('toggle-password').addEventListener('click', function () {
+            const input = document.getElementById('input-password');
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash text-base';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye text-base';
+            }
+        });
+
+        // Login form submit
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById('input-username').value.trim();
+            const password = document.getElementById('input-password').value;
+            const errorEl = document.getElementById('login-error');
+            const errorText = document.getElementById('login-error-text');
+            const btnLogin = document.getElementById('btn-login');
+
+            if (!username || !password) {
+                errorEl.classList.remove('hidden');
+                errorText.textContent = 'Username dan password harus diisi';
+                return;
+            }
+
+            btnLogin.disabled = true;
+            btnLogin.innerHTML = '<i class="bi bi-hourglass-split animate-spin"></i> Memproses...';
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+                .then(r => r.json())
+                .then(res => {
+                    btnLogin.disabled = false;
+                    btnLogin.textContent = 'Masuk';
+
+                    if (res.message === 'success') {
+                        errorEl.classList.add('hidden');
+                        window.location.href = '/index.html';
+                    } else {
+                        errorEl.classList.remove('hidden');
+                        errorText.textContent = res.error || 'Username atau password salah';
+                    }
+                })
+                .catch(err => {
+                    btnLogin.disabled = false;
+                    btnLogin.textContent = 'Masuk';
+                    errorEl.classList.remove('hidden');
+                    errorText.textContent = 'Terjadi kesalahan jaringan';
+                });
+        });
+
+        // Focus username input on load
+        document.getElementById('input-username').focus();
+    </script>
+</body>
+
+</html>

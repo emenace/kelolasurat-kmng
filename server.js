@@ -4,6 +4,8 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
 const upload = multer({ storage: multer.memoryStorage() });
 
 const db = require('./database/logic/database');
@@ -14,8 +16,121 @@ const dbSKCuti = require('./database/logic/database_skcuti');
 const app = express();
 const port = 3000;
 
-app.use(cors());
+// Trust reverse proxy (Nginx) for secure cookies and headers
+app.set('trust proxy', 1);
+
+// --- Login credentials ---
+const LOGIN_USER = process.env.LOGIN_USER || 'root';
+const LOGIN_PASS = process.env.LOGIN_PASS || 'pwdKEPEGAWAIAN@123';
+
+// --- Session store (in-memory) ---
+const sessions = {};
+const SESSION_MAX_AGE = 60 * 60 * 1000; // 1 hour in ms
+
+function generateToken() {
+    return crypto.randomBytes(32).toString('hex');
+}
+
+function isValidSession(token) {
+    const session = sessions[token];
+    if (!session) return false;
+    if (Date.now() - session.createdAt > SESSION_MAX_AGE) {
+        delete sessions[token];
+        return false;
+    }
+    return true;
+}
+
+// --- CORS Configuration for secure cross-origin requests ---
+const allowedOrigins = [
+    'https://surat.emenace.my.id',
+    'http://surat.emenace.my.id',
+    'https://stat.emenace.my.id',
+    'http://stat.emenace.my.id',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps, same-origin, or curl)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.emenace.my.id')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true
+}));
+
 app.use(express.json());
+app.use(cookieParser());
+
+// --- Login API (public, no auth required) ---
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === LOGIN_USER && password === LOGIN_PASS) {
+        const token = generateToken();
+        sessions[token] = { user: username, createdAt: Date.now() };
+        
+        const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+        res.cookie('session_token', token, {
+            httpOnly: true,
+            secure: isSecure,
+            maxAge: SESSION_MAX_AGE,
+            sameSite: isSecure ? 'none' : 'lax'
+        });
+        res.json({ message: 'success' });
+    } else {
+        res.status(401).json({ error: 'Username atau password salah' });
+    }
+});
+
+// --- Logout API ---
+app.post('/api/logout', (req, res) => {
+    const token = req.cookies.session_token;
+    if (token && sessions[token]) {
+        delete sessions[token];
+    }
+    res.clearCookie('session_token');
+    res.json({ message: 'success' });
+});
+
+// --- Auth check API ---
+app.get('/api/auth-check', (req, res) => {
+    const token = req.cookies.session_token;
+    if (isValidSession(token)) {
+        res.json({ message: 'authenticated', user: sessions[token].user });
+    } else {
+        res.status(401).json({ error: 'not authenticated' });
+    }
+});
+
+// --- Serve login.html publicly ---
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// --- Auth middleware: protect everything else ---
+app.use((req, res, next) => {
+    // Allow login-related assets and public assets (fonts, images like logo_kemenag.png, css)
+    if (req.path.startsWith('/assets/') || req.path === '/style.css') {
+        return next();
+    }
+    const token = req.cookies.session_token;
+    if (isValidSession(token)) {
+        return next();
+    }
+    // If it's an API request, return 401 JSON
+    if (req.path.startsWith('/api/')) {
+        return res.status(401).json({ error: 'Unauthorized, silakan login terlebih dahulu' });
+    }
+    // If it's a page request, redirect to login
+    res.redirect('/login.html');
+});
+
+// --- Serve static files (after auth middleware) ---
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- API for Surat Keluar ---
